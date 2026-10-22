@@ -18,7 +18,7 @@ concurrency:
 jobs:
   sync-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -36,13 +36,10 @@ jobs:
       - name: Токен Т-Инвестиции API (только чтение)
         run: printf '%s' '${{ secrets.TBANK_TOKEN }}' > broker-token.txt
 
-      - name: Синхронизация портфеля с брокером (3 попытки)
-        run: |
-          for i in 1 2 3; do
-            if python sync_broker.py; then break; fi
-            echo "попытка $i неудачна, пауза $((i*3)) мин"
-            sleep $((i*180))
-          done
+      - name: Синхронизация портфеля с брокером
+        # если шлюз банка недоступен — продолжаем с текущими данными портфеля;
+        # почасовой расписание сам подхватит портфель, когда банк оживёт
+        run: python sync_broker.py || echo 'синхронизация с брокером не удалась — продолжаем с текущими данными'
 
       - name: Обновление котировок MOEX
         run: python fetch_moex.py
