@@ -1,0 +1,52 @@
+{
+ "SU26228RMFS5": {
+  "nextDate": "2027-04-14",
+  "nextValueRub": 38.15,
+  "perYear": 3
+ },
+ "SU26232RMFS7": {
+  "nextDate": "2027-04-07",
+  "nextValueRub": 29.92,
+  "perYear": 2
+ },
+ "SU26235RMFS0": {
+  "nextDate": "2027-03-17",
+  "nextValueRub": 29.42,
+  "perYear": 3
+ },
+ "SU26239RMFS2": {
+  "nextDate": "2027-01-27",
+  "nextValueRub": 34.41,
+  "perYear": 3
+ },
+ "SU26244RMFS2": {
+  "nextDate": "2027-03-24",
+  "nextValueRub": 56.1,
+  "perYear": 3
+ },
+ "SU26247RMFS5": {
+  "nextDate": "2026-11-25",
+  "nextValueRub": 61.08,
+  "perYear": 3
+ },
+ "SU26252RMFS5": {
+  "nextDate": "2027-04-21",
+  "nextValueRub": 62.33,
+  "perYear": 3
+ },
+ "SU26253RMFS3": {
+  "nextDate": "2027-04-21",
+  "nextValueRub": 64.82,
+  "perYear": 3
+ },
+ "RU000A10CSQ2": {
+  "nextDate": "2026-11-16",
+  "nextValueRub": 11.92,
+  "perYear": 7
+ },
+ "RU000A10EJQ7": {
+  "nextDate": "2026-12-11",
+  "nextValueRub": 36.65,
+  "perYear": 5
+ }
+}

@@ -1,0 +1,449 @@
+{
+ "asOf": "2026-10-22",
+ "3": [
+  {
+   "secid": "SU26236RMFS8",
+   "isin": "RU000A102BT8",
+   "name": "ОФЗ 26236",
+   "type": "ОФЗ",
+   "price": 88.45,
+   "yield": 14.59,
+   "durationDays": 541,
+   "matdate": "2028-05-17",
+   "couponPercent": 5.7,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26207RMFS9",
+   "isin": "RU000A0JS3W6",
+   "name": "ОФЗ 26207",
+   "type": "ОФЗ",
+   "price": 98.7,
+   "yield": 13.27,
+   "durationDays": 104,
+   "matdate": "2027-02-03",
+   "couponPercent": 8.15,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26232RMFS7",
+   "isin": "RU000A1014N4",
+   "name": "ОФЗ 26232",
+   "type": "ОФЗ",
+   "price": 93.87,
+   "yield": 13.2,
+   "durationDays": 344,
+   "matdate": "2027-10-06",
+   "couponPercent": 6.0,
+   "listLevel": 1
+  }
+ ],
+ "4": [
+  {
+   "secid": "SU26249RMFS1",
+   "isin": "RU000A10BVC8",
+   "name": "ОФЗ 26249",
+   "type": "ОФЗ",
+   "price": 83.26,
+   "yield": 16.04,
+   "durationDays": 1477,
+   "matdate": "2032-06-16",
+   "couponPercent": 11.0,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26235RMFS0",
+   "isin": "RU000A1028E3",
+   "name": "ОФЗ 26235",
+   "type": "ОФЗ",
+   "price": 71.19,
+   "yield": 15.64,
+   "durationDays": 1386,
+   "matdate": "2031-03-12",
+   "couponPercent": 5.9,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26251RMFS7",
+   "isin": "RU000A10CKT3",
+   "name": "ОФЗ 26251",
+   "type": "ОФЗ",
+   "price": 84.14,
+   "yield": 15.54,
+   "durationDays": 1172,
+   "matdate": "2030-08-28",
+   "couponPercent": 9.5,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26228RMFS5",
+   "isin": "RU000A100A82",
+   "name": "ОФЗ 26228",
+   "type": "ОФЗ",
+   "price": 81.06,
+   "yield": 15.32,
+   "durationDays": 1116,
+   "matdate": "2030-04-10",
+   "couponPercent": 7.65,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26242RMFS6",
+   "isin": "RU000A105RV3",
+   "name": "ОФЗ 26242",
+   "type": "ОФЗ",
+   "price": 87.59,
+   "yield": 14.82,
+   "durationDays": 922,
+   "matdate": "2029-08-29",
+   "couponPercent": 9.0,
+   "listLevel": 1
+  }
+ ],
+ "5": [
+  {
+   "secid": "RU000A10A3Z4",
+   "isin": "RU000A10A3Z4",
+   "name": "ГТЛК 2P-04",
+   "type": "Корпоративная",
+   "price": 108.01,
+   "yield": 17.94,
+   "durationDays": 341,
+   "matdate": "2029-10-25",
+   "couponPercent": 25.0,
+   "listLevel": 1
+  },
+  {
+   "secid": "RU000A101GD3",
+   "isin": "RU000A101GD3",
+   "name": "ГТЛК 1P-16",
+   "type": "Корпоративная",
+   "price": 92.48,
+   "yield": 17.93,
+   "durationDays": 280,
+   "matdate": "2028-02-17",
+   "couponPercent": 6.95,
+   "listLevel": 1
+  },
+  {
+   "secid": "RU000A10DP51",
+   "isin": "RU000A10DP51",
+   "name": "sГТЛК2P-11",
+   "type": "Корпоративная",
+   "price": 100.05,
+   "yield": 17.84,
+   "durationDays": 638,
+   "matdate": "2028-11-16",
+   "couponPercent": null,
+   "listLevel": 1
+  },
+  {
+   "secid": "RU000A10DHV3",
+   "isin": "RU000A10DHV3",
+   "name": "Инаркт2Р5",
+   "type": "Корпоративная",
+   "price": 100.04,
+   "yield": 17.81,
+   "durationDays": 634,
+   "matdate": "2028-11-03",
+   "couponPercent": null,
+   "listLevel": 1
+  },
+  {
+   "secid": "RU000A10BY94",
+   "isin": "RU000A10BY94",
+   "name": "Систем2P03",
+   "type": "Корпоративная",
+   "price": 102.11,
+   "yield": 17.72,
+   "durationDays": 145,
+   "matdate": "2027-03-24",
+   "couponPercent": 21.5,
+   "listLevel": 1
+  }
+ ],
+ "6": [
+  {
+   "secid": "RU000A10E9M5",
+   "isin": "RU000A10E9M5",
+   "name": "ЗОнлайнБ02",
+   "type": "Замещающая",
+   "price": 100.52,
+   "yield": 27.91,
+   "durationDays": 195,
+   "matdate": "2029-01-27",
+   "couponPercent": 26.0,
+   "listLevel": 3
+  },
+  {
+   "secid": "RU000A108Y11",
+   "isin": "RU000A108Y11",
+   "name": "ДФФ ЗО28",
+   "type": "Замещающая",
+   "price": 79.36,
+   "yield": 26.64,
+   "durationDays": 458,
+   "matdate": "2028-02-08",
+   "couponPercent": 5.35,
+   "listLevel": 3
+  },
+  {
+   "secid": "RU000A107JN3",
+   "isin": "RU000A107JN3",
+   "name": "ТМК ЗО2027",
+   "type": "Замещающая",
+   "price": 94.79,
+   "yield": 26.03,
+   "durationDays": 113,
+   "matdate": "2027-02-12",
+   "couponPercent": 4.3,
+   "listLevel": 3
+  },
+  {
+   "secid": "RU000A10DRX8",
+   "isin": "RU000A10DRX8",
+   "name": "ЗООПТБ01",
+   "type": "Замещающая",
+   "price": 105.64,
+   "yield": 22.66,
+   "durationDays": 608,
+   "matdate": "2028-11-25",
+   "couponPercent": 24.0,
+   "listLevel": 3
+  },
+  {
+   "secid": "RU000A108NQ6",
+   "isin": "RU000A108NQ6",
+   "name": "МКБ ЗО2027",
+   "type": "Замещающая",
+   "price": 91.5,
+   "yield": 18.1,
+   "durationDays": 341,
+   "matdate": "2027-10-05",
+   "couponPercent": 7.5,
+   "listLevel": 3
+  }
+ ],
+ "10": [
+  {
+   "secid": "SU29029RMFS4",
+   "isin": "RU000A10D525",
+   "name": "ОФЗ 29029",
+   "type": "ОФЗ",
+   "price": 93.71,
+   "yield": 17.01,
+   "durationDays": 2219,
+   "matdate": "2041-10-22",
+   "couponPercent": null,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU29028RMFS6",
+   "isin": "RU000A10D4Z9",
+   "name": "ОФЗ 29028",
+   "type": "ОФЗ",
+   "price": 93.86,
+   "yield": 16.95,
+   "durationDays": 2134,
+   "matdate": "2039-10-22",
+   "couponPercent": null,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU29027RMFS8",
+   "isin": "RU000A10AA93",
+   "name": "ОФЗ 29027",
+   "type": "ОФЗ",
+   "price": 94.62,
+   "yield": 16.87,
+   "durationDays": 1906,
+   "matdate": "2036-09-11",
+   "couponPercent": null,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26245RMFS9",
+   "isin": "RU000A108EG6",
+   "name": "ОФЗ 26245",
+   "type": "ОФЗ",
+   "price": 81.04,
+   "yield": 16.62,
+   "durationDays": 1939,
+   "matdate": "2035-09-26",
+   "couponPercent": 12.0,
+   "listLevel": 1
+  },
+  {
+   "secid": "SU26253RMFS3",
+   "isin": "RU000A10D517",
+   "name": "ОФЗ 26253",
+   "type": "ОФЗ",
+   "price": 83.87,
+   "yield": 16.6,
+   "durationDays": 2149,
+   "matdate": "2038-10-06",
+   "couponPercent": 13.0,
+   "listLevel": 1
+  }
+ ],
+ "1": [
+  {
+   "kind": "deposit",
+   "name": "ПСБ · Народный вклад",
+   "desc": "до 30% · 32 дня · 10–50 тыс. ₽ · новые клиенты",
+   "buyUrl": "https://www.psbank.ru/"
+  },
+  {
+   "kind": "deposit",
+   "name": "Альфа-Банк · Альфа-Вклад Зарплатный",
+   "desc": "до 19,83% · 62 дня · зарплатные клиенты",
+   "buyUrl": "https://alfabank.ru/"
+  },
+  {
+   "kind": "deposit",
+   "name": "Сбербанк · Выгодный старт +",
+   "desc": "до 19% · 91 день · до 100 тыс. ₽ · новые клиенты",
+   "buyUrl": "https://www.sberbank.ru/"
+  },
+  {
+   "kind": "deposit",
+   "name": "Яндекс Банк · Сейв",
+   "desc": "до 17% · 14–730 дней · от 10 тыс. ₽",
+   "buyUrl": "https://bank.yandex.ru/"
+  },
+  {
+   "kind": "deposit",
+   "name": "Газпромбанк · Ключевой момент",
+   "desc": "до 16% · плавающая ставка · до 3 лет · от 100 тыс. ₽",
+   "buyUrl": "https://www.gazprombank.ru/"
+  }
+ ],
+ "2": [
+  {
+   "kind": "fund",
+   "name": "SBMM · Фонд Сберегательный (УК Первая)",
+   "desc": "+16,20% за 12 мес. · комиссия 0,30% · СЧА 331 млрд",
+   "buyUrl": "https://www.tbank.ru/invest/funds/SBMM/"
+  },
+  {
+   "kind": "fund",
+   "name": "LQDT · Ликвидность (ВИМ)",
+   "desc": "+16,08% за 12 мес. · комиссия 0,29% · СЧА 500+ млрд",
+   "buyUrl": "https://www.tbank.ru/invest/funds/LQDT/"
+  },
+  {
+   "kind": "fund",
+   "name": "AMNR · Накопительный (АТОН)",
+   "desc": "+15,99% за 12 мес. · комиссия 0,29%",
+   "buyUrl": "https://www.tbank.ru/invest/funds/AMNR/"
+  },
+  {
+   "kind": "fund",
+   "name": "FINC · Денежный рынок + (Финстар)",
+   "desc": "+15,90% за 12 мес. · комиссия 0,31%",
+   "buyUrl": "https://www.tbank.ru/invest/funds/FINC/"
+  },
+  {
+   "kind": "fund",
+   "name": "BCSD · Денежный рынок (БКС)",
+   "desc": "+15,80% за 12 мес. · комиссия 0,50%",
+   "buyUrl": "https://www.tbank.ru/invest/funds/BCSD/"
+  }
+ ],
+ "7": [
+  {
+   "kind": "stock",
+   "name": "МТС (MTSS)",
+   "desc": "дивдоходность 20,1% · 18 лет без пропусков выплат",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/MTSS/"
+  },
+  {
+   "kind": "stock",
+   "name": "Транснефть ап (TRNFP)",
+   "desc": "дивдоходность 19,3% · 18 лет, растёт 5 лет подряд",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/TRNFP/"
+  },
+  {
+   "kind": "stock",
+   "name": "Сбербанк (SBER)",
+   "desc": "дивдоходность 12,8% · лидер отрасли",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/SBER/"
+  },
+  {
+   "kind": "stock",
+   "name": "Лукойл (LKOH)",
+   "desc": "дивдоходность 11,2% · «дивидендный король»",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/LKOH/"
+  },
+  {
+   "kind": "stock",
+   "name": "Башинформсвязь ап (BISVP)",
+   "desc": "дивдоходность 10,2% · 18 лет выплат",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/BISVP/"
+  }
+ ],
+ "8": [
+  {
+   "kind": "stock",
+   "name": "Лукойл (LKOH)",
+   "desc": "дивдоходность 11,2% · 100% СДДП, прозрачная политика",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/LKOH/"
+  },
+  {
+   "kind": "stock",
+   "name": "Башнефть ап (BANEP)",
+   "desc": "дивдоходность 8,7% · 18 лет выплат",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/BANEP/"
+  },
+  {
+   "kind": "stock",
+   "name": "Газпром нефть (SIBN)",
+   "desc": "дивдоходность 7,9% · сильный FCF",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/SIBN/"
+  },
+  {
+   "kind": "stock",
+   "name": "Новатэк (NVTK)",
+   "desc": "дивдоходность 7,3% · крупнейший независимый газовик",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/NVTK/"
+  },
+  {
+   "kind": "stock",
+   "name": "Татнефть (TATN)",
+   "desc": "дивдоходность 5,4% · 18 лет, растёт 4 года подряд",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/TATN/"
+  }
+ ],
+ "9": [
+  {
+   "kind": "fund",
+   "name": "TGLD · БПИФ «Т-Инвестиции Золото»",
+   "desc": "биржевой фонд на золото · комиссия 0,74%",
+   "buyUrl": "https://www.tbank.ru/invest/funds/TGLD/"
+  },
+  {
+   "kind": "fund",
+   "name": "GLDRUB_TOM · биржевое золото (спот)",
+   "desc": "золото в рублях, расчёты TOM · без комиссии УК",
+   "buyUrl": "https://www.moex.com/ru/issue/GLDRUB_TOM.aspx"
+  },
+  {
+   "kind": "stock",
+   "name": "Полюс (PLZL)",
+   "desc": "крупнейший золотодобытчик РФ · бизнес-риск эмитента",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/PLZL/"
+  },
+  {
+   "kind": "stock",
+   "name": "Селигдар (SELG)",
+   "desc": "золото и олово · облигации рейтинга А+",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/SELG/"
+  },
+  {
+   "kind": "stock",
+   "name": "Высочайший (GCHE)",
+   "desc": "золотодобыча · малый бизнес, высокая волатильность",
+   "buyUrl": "https://www.tbank.ru/invest/stocks/GCHE/"
+  }
+ ]
+}

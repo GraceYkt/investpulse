@@ -1,0 +1,72 @@
+name: InvestPulse — синхронизация и публикация
+
+on:
+  schedule:
+    # каждый час в :07 (обновление портфеля, котировок, аналитики)
+    - cron: '7 * * * *'
+  workflow_dispatch: {} # ручной запуск кнопкой в интерфейсе GitHub
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: investpulse
+  cancel-in-progress: false
+
+jobs:
+  sync-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Токен Т-Инвестиции API (только чтение)
+        run: printf '%s' '${{ secrets.TBANK_TOKEN }}' > broker-token.txt
+
+      - name: Синхронизация портфеля с брокером (3 попытки)
+        run: |
+          for i in 1 2 3; do
+            if python sync_broker.py; then break; fi
+            echo "попытка $i неудачна, пауза $((i*3)) мин"
+            sleep $((i*180))
+          done
+
+      - name: Обновление котировок MOEX
+        run: python fetch_moex.py
+
+      - name: Обновление купонов
+        run: python fetch_coupons.py
+
+      - name: Подборка топ-10 и аналитика
+        run: |
+          python fetch_picks.py || true
+          python merge_picks.py || true
+          python gen_analytics.py || true
+
+      - name: Сборка приложения
+        run: |
+          cd invest-app
+          npm ci
+          npm run build
+
+      - name: Публикация на GitHub Pages
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: invest-app/dist
+
+      - name: Деплой
+        uses: actions/deploy-pages@v4
