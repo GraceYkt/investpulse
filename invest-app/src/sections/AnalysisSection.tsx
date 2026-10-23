@@ -327,7 +327,7 @@ export default function AnalysisSection() {
   }, [filtered]);
 
   /** Сводная строка блока: средняя доходность, средняя дюрация облигаций, число позиций. */
-  const blockStats = (groups: [number, Item][]) => {
+  const blockStats = (groups: [number, Item[]][]) => {
     const items = groups.flatMap(([, arr]) => arr);
     const yields = items.map(rating).filter((y) => y > 0);
     const durs = items.filter((i) => i.kind === 'bond' && i.durationYears != null);
