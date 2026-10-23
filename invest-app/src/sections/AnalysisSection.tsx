@@ -52,6 +52,13 @@ function metricLine(it: Item): string {
   return it.desc ?? '';
 }
 
+/** Рейтинг инструмента внутри топ-5: ожидаемая доходность, % годовых. */
+function rating(it: Item): number {
+  if (it.yield != null) return it.yield;
+  const m = (it.desc ?? '').match(/(\d+(?:[.,]\d+)?)\s*%/);
+  return m ? parseFloat(m[1].replace(',', '.')) : 0;
+}
+
 /** Итог сценария: сколько зарабатываем в % и как долго держим позицию. */
 function scenarioProfit(it: Item, scen: 'down' | 'flat' | 'up'): string {
   const num = (v: number, sign = true) => `${sign && v > 0 ? '+' : ''}${v.toFixed(1).replace('.', ',')}%`;
@@ -299,7 +306,10 @@ export default function AnalysisSection() {
       arr.push(it);
       m.set(it.rank, arr);
     }
-    return Array.from(m.entries()).sort((a, b) => a[0] - b[0]);
+    // внутри каждой идеи — по рейтингу (доходность по убыванию)
+    return Array.from(m.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([rank, arr]) => [rank, [...arr].sort((x, y) => rating(y) - rating(x))] as [number, Item[]]);
   }, [filtered]);
 
   return (
@@ -357,17 +367,24 @@ export default function AnalysisSection() {
             <span className="text-sm font-semibold">
               #{rank} · {items[0].ideaTitle}
             </span>
-            <span className="ml-2 text-[11px] text-muted-foreground">{items.length} инструментов</span>
+            <span className="ml-2 text-[11px] text-muted-foreground">
+              топ-{items.length} по рейтингу (доходность)
+            </span>
           </div>
           <div className="grid gap-2 p-2 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((it) => (
+            {items.map((it, idx) => (
               <button
                 key={it.key}
                 onClick={() => setOpen(it)}
                 className="rounded-lg border border-border/50 p-2.5 text-left transition-colors hover:border-indigo-400/40 hover:bg-muted/20"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-xs font-semibold">{it.name}</span>
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold tabular-nums">
+                      {idx + 1}
+                    </span>
+                    <span className="truncate text-xs font-semibold">{it.name}</span>
+                  </span>
                   <Badge variant="outline" className="shrink-0 text-[10px]">{it.assetType}</Badge>
                 </div>
                 <p className="mt-1 truncate text-[11px] text-muted-foreground">{metricLine(it)}</p>
