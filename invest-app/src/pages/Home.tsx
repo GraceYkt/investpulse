@@ -1,10 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, PieChart, Lightbulb, Radio, RefreshCw, BarChart3, CloudDownload } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Activity, PieChart, Lightbulb, Radio, RefreshCw, BarChart3, CloudDownload, KeyRound } from 'lucide-react';
 import { DATA_AS_OF, POSITIONS } from '@/data/portfolio';
 import { buildPortfolioSignals, buildRiskSignals, portfolioHistory, totals } from '@/lib/portfolio';
+import {
+  fetchBrokerPortfolio, getBrokerToken, saveBrokerToken, type BrokerHolding,
+} from '@/lib/brokerSync';
 import type { Position } from '@/types/portfolio';
 import OverviewCards from '@/sections/OverviewCards';
 import PortfolioChart from '@/sections/PortfolioChart';
@@ -49,6 +54,11 @@ export default function Home() {
   const [refreshError, setRefreshError] = useState(false);
   const [syncState, setSyncState] = useState<'idle' | 'running' | 'done' | 'error'>('idle');
   const [syncMsg, setSyncMsg] = useState<string | null>(null);
+  const [brokerStatus, setBrokerStatus] = useState<string | null>(null);
+  const [brokerSyncing, setBrokerSyncing] = useState(false);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
+  const [tokenDraft, setTokenDraft] = useState('');
+  const autoSyncRan = useRef(false);
 
   // Кнопка «Синхронизировать API»: локальный сервер (sync-server.bat) гоняет
   // цепочку sync_broker → MOEX → купоны → сборка; здесь только следим за статусом.
@@ -84,6 +94,93 @@ export default function Home() {
       setSyncState('error');
       setSyncMsg('Сервер синхронизации недоступен. Запустите sync-server.bat.');
     });
+  };
+
+  // --- Прямая синхронизация с банком из браузера ---
+  const applyBrokerHoldings = (holdings: BrokerHolding[]) => {
+    const today = new Date().toISOString().slice(0, 10);
+    const map = new Map(holdings.map((h) => [h.secid, h]));
+    let added = 0;
+    setPositions((prev) => {
+      const updated = prev.map((p) => {
+        const h = map.get(p.id);
+        return h ? { ...p, quantity: h.qty, avgBuyPrice: h.avg } : p;
+      });
+      const known = new Set(prev.map((p) => p.id));
+      const fresh: Position[] = holdings
+        .filter((h) => !known.has(h.secid))
+        .map((h) => ({
+          id: h.secid,
+          ticker: h.secid,
+          name: h.secid,
+          type: 'bond' as const,
+          sector: h.secid.startsWith('SU26') ? 'ОФЗ' : 'Корпоративные',
+          quantity: h.qty,
+          avgBuyPrice: h.avg,
+          currentPrice: h.avg,
+          buyDate: today,
+          fundamentalFlags: [],
+          history: [{ date: today, price: h.avg }],
+        }));
+      added = fresh.length;
+      return [...updated, ...fresh];
+    });
+    return added;
+  };
+
+  const directBrokerSync = async (auto = false): Promise<boolean> => {
+    const token = getBrokerToken();
+    if (!token) {
+      if (!auto) {
+        setTokenDraft('');
+        setTokenDialogOpen(true);
+      }
+      return false;
+    }
+    if (!auto) {
+      setBrokerSyncing(true);
+      setSyncState('running');
+      setSyncMsg(null);
+    }
+    try {
+      const holdings = await fetchBrokerPortfolio(token);
+      const added = applyBrokerHoldings(holdings);
+      const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      setBrokerStatus(`Портфель загружен из банка в ${time}${added ? ` · новых позиций: ${added}` : ''}`);
+      setSyncState('done');
+      return true;
+    } catch (e) {
+      setBrokerStatus(null);
+      if (!auto) {
+        setSyncState('error');
+        const reason = e instanceof Error ? e.message : String(e);
+        const local = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        setSyncMsg(`Прямое подключение к банку не удалось: ${reason}.${local ? ' Пробую локальный сервер синхронизации…' : ''}`);
+      }
+      return false;
+    } finally {
+      setBrokerSyncing(false);
+    }
+  };
+
+  // При открытии страницы — сразу обращаемся в банк (если токен сохранён в браузере)
+  useEffect(() => {
+    if (autoSyncRan.current) return;
+    autoSyncRan.current = true;
+    if (getBrokerToken()) directBrokerSync(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onSyncClick = async () => {
+    if (!getBrokerToken()) {
+      setTokenDraft('');
+      setTokenDialogOpen(true);
+      return;
+    }
+    const ok = await directBrokerSync(false);
+    if (!ok && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      await syncApi(); // запасной путь: локальный сервер (sync-server.bat)
+    }
   };
 
   useEffect(() => {
@@ -190,15 +287,27 @@ export default function Home() {
             <Button
               variant={syncState === 'error' ? 'destructive' : 'outline'}
               size="sm"
-              onClick={syncApi}
-              disabled={syncState === 'running'}
+              onClick={onSyncClick}
+              disabled={syncState === 'running' || brokerSyncing}
               className="gap-1.5"
-              title="Синхронизировать портфель с брокерским счётом через Т-Инвестиции API (нужен запущенный sync-server.bat)"
+              title="Синхронизировать портфель напрямую с брокерским счётом через Т-Инвестиции API (токен сохраняется только в вашем браузере)"
             >
-              <CloudDownload className={`h-3.5 w-3.5 ${syncState === 'running' ? 'animate-bounce' : ''}`} />
+              <CloudDownload className={`h-3.5 w-3.5 ${syncState === 'running' || brokerSyncing ? 'animate-bounce' : ''}`} />
               <span className="hidden sm:inline">
-                {syncState === 'running' ? 'Синхронизация…' : 'Синхронизировать API'}
+                {syncState === 'running' || brokerSyncing ? 'Синхронизация…' : 'Синхронизировать API'}
               </span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setTokenDraft(getBrokerToken());
+                setTokenDialogOpen(true);
+              }}
+              title={getBrokerToken() ? 'Токен Т-Инвестиции API сохранён (нажмите, чтобы заменить)' : 'Ввести токен Т-Инвестиции API (только чтение)'}
+              className={`h-8 w-8 px-0 ${getBrokerToken() ? 'text-emerald-400' : 'text-muted-foreground'}`}
+            >
+              <KeyRound className="h-3.5 w-3.5" />
             </Button>
             <div className="hidden items-center gap-2 text-xs text-muted-foreground xl:flex">
               <Radio className="h-3.5 w-3.5 text-emerald-400" />
@@ -221,6 +330,9 @@ export default function Home() {
             >
               {syncMsg}
             </div>
+          )}
+          {brokerStatus && (
+            <div className="w-full text-right text-[11px] text-emerald-400">{brokerStatus}</div>
           )}
         </div>
       </header>
@@ -249,6 +361,45 @@ export default function Home() {
           <AnalysisSection />
         </TabsContent>
       </main>
+
+      {/* Диалог ввода токена Т-Инвестиции API */}
+      <Dialog open={tokenDialogOpen} onOpenChange={setTokenDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Токен Т-Инвестиции API</DialogTitle>
+            <DialogDescription>
+              Нужен токен <b>только для чтения</b> (read-only). Он хранится исключительно в
+              браузере этого устройства и отправляется напрямую в API банка. Выпускается в
+              приложении Т-Инвестиций: Профиль → Настройки → Токены для API.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Input
+              type="password"
+              placeholder="t.XXXX…"
+              value={tokenDraft}
+              onChange={(e) => setTokenDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && tokenDraft.trim()) {
+                  saveBrokerToken(tokenDraft);
+                  setTokenDialogOpen(false);
+                  directBrokerSync(false);
+                }
+              }}
+            />
+            <Button
+              disabled={!tokenDraft.trim()}
+              onClick={() => {
+                saveBrokerToken(tokenDraft);
+                setTokenDialogOpen(false);
+                directBrokerSync(false);
+              }}
+            >
+              Сохранить
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Tabs>
   );
 }
