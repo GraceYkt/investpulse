@@ -326,6 +326,36 @@ export default function AnalysisSection() {
       .map(([rank, arr]) => [rank, [...arr].sort((x, y) => rating(y) - rating(x))] as [number, Item[]]);
   }, [filtered]);
 
+  /** Сводная строка блока: средняя доходность, средняя дюрация облигаций, число позиций. */
+  const blockStats = (groups: [number, Item][]) => {
+    const items = groups.flatMap(([, arr]) => arr);
+    const yields = items.map(rating).filter((y) => y > 0);
+    const durs = items.filter((i) => i.kind === 'bond' && i.durationYears != null);
+    const avgYield = yields.length ? yields.reduce((a, b) => a + b, 0) / yields.length : 0;
+    const avgDur = durs.length ? durs.reduce((a, i) => a + (i.durationYears ?? 0), 0) / durs.length : 0;
+    const ideas = groups.length;
+    return { count: items.length, ideas, avgYield, avgDur, hasDur: durs.length > 0 };
+  };
+
+  const renderStats = (s: ReturnType<typeof blockStats>) => (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-border/50 bg-muted/25 px-3 py-2 text-[11px] tabular-nums">
+      <span>
+        <span className="text-muted-foreground">Позиций:</span>{' '}
+        <b>{s.count}</b> <span className="text-muted-foreground">в {s.ideas} разделах</span>
+      </span>
+      <span>
+        <span className="text-muted-foreground">Средняя доходность:</span>{' '}
+        <b className="text-emerald-400">{s.avgYield.toFixed(1).replace('.', ',')}%</b>
+      </span>
+      {s.hasDur && (
+        <span>
+          <span className="text-muted-foreground">Средняя дюрация:</span>{' '}
+          <b className="text-indigo-300">{s.avgDur.toFixed(1).replace('.', ',')} г</b>
+        </span>
+      )}
+    </div>
+  );
+
   const renderGroup = ([rank, items]: [number, Item[]], n: number) => (
     <div key={rank} className="panel overflow-hidden rounded-xl">
       <div className="border-b border-border/60 px-4 py-2.5">
@@ -425,6 +455,7 @@ export default function AnalysisSection() {
               работают на сценарий снижения ставки, но проседают при её росте.
             </p>
           </div>
+          {dependent.length > 0 && renderStats(blockStats(dependent))}
           {dependent.length === 0 ? (
             <div className="panel rounded-xl p-5 text-center text-xs text-muted-foreground">
               Нет инструментов под текущими фильтрами.
@@ -444,6 +475,7 @@ export default function AnalysisSection() {
               бумага не «переоценивается» вместе со ставкой.
             </p>
           </div>
+          {independent.length > 0 && renderStats(blockStats(independent))}
           {independent.length === 0 ? (
             <div className="panel rounded-xl p-5 text-center text-xs text-muted-foreground">
               Нет инструментов под текущими фильтрами.
