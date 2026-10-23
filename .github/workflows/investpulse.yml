@@ -53,6 +53,9 @@ jobs:
           python merge_picks.py || true
           python gen_analytics.py || true
 
+      - name: Скринер «не только про ставку»
+        run: python screen_instruments.py || echo 'скринер недоступен — продолжаем без него'
+
       - name: Сборка приложения
         run: |
           cd invest-app

@@ -1,0 +1,878 @@
+{
+ "generatedAt": "2026-10-23 16:23",
+ "keyRate": 14.0,
+ "counts": {
+  "bonds": 11,
+  "shares": 25
+ },
+ "groups": {
+  "reliable": [
+   {
+    "secid": "SU26249RMFS1",
+    "name": "ОФЗ 26249",
+    "kind": "ofz",
+    "isOfz": true,
+    "maturity": "2032-06-16",
+    "listLevel": 1,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 95.0,
+     "rateFree": 59.6,
+     "yield": 50.7,
+     "liquidity": 0.0,
+     "comfort": 37.3,
+     "yieldPct": 16.06,
+     "durationYears": 4.04,
+     "couponPct": 11.0
+    },
+    "total": 56.8,
+    "why": "госгарантия (ОФЗ); доходность 16.06% выше ставки ЦБ"
+   },
+   {
+    "secid": "SU26246RMFS7",
+    "name": "ОФЗ 26246",
+    "kind": "ofz",
+    "isOfz": true,
+    "maturity": "2036-03-12",
+    "listLevel": 1,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 95.0,
+     "rateFree": 46.0,
+     "yield": 58.2,
+     "liquidity": 0.0,
+     "comfort": 45.2,
+     "yieldPct": 16.66,
+     "durationYears": 5.4,
+     "couponPct": 12.0
+    },
+    "total": 56.8,
+    "why": "госгарантия (ОФЗ); доходность 16.66% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10DZK8",
+    "name": "ПолипП2Б13",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-12-16",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 89.8,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 100.0,
+     "yieldPct": 42.94,
+     "durationYears": 1.02,
+     "couponPct": 19.45
+    },
+    "total": 74.0,
+    "why": "короткая дюрация 1.02 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 42.94% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10EAC6",
+    "name": "КАМАЗ БП20",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2028-02-06",
+    "listLevel": 2,
+    "turnoverMn": 0.5,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 88.4,
+     "yield": 67.5,
+     "liquidity": 12.5,
+     "comfort": 76.6,
+     "yieldPct": 17.4,
+     "durationYears": 1.16,
+     "couponPct": 15.95
+    },
+    "total": 65.1,
+    "why": "короткая дюрация 1.16 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 17.4% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10DPS2",
+    "name": "Атомэнпр09",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-05-29",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 66.8,
+     "yield": 49.8,
+     "liquidity": 1.0,
+     "comfort": 69.8,
+     "yieldPct": 15.98,
+     "durationYears": 3.32,
+     "couponPct": 15.1
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.98% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10CT33",
+    "name": "Атомэнпр08",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2030-09-17",
+    "listLevel": 2,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 70.1,
+     "yield": 48.9,
+     "liquidity": 0.0,
+     "comfort": 66.7,
+     "yieldPct": 15.91,
+     "durationYears": 2.99,
+     "couponPct": 14.7
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.91% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A101QN1",
+    "name": "ГазпромКP4",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-05-25",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 94.4,
+     "yield": 49.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 15.92,
+     "durationYears": 0.56,
+     "couponPct": 5.9
+    },
+    "total": 52.1,
+    "why": "короткая дюрация 0.56 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 15.92% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10G5K5",
+    "name": "ГПН005Р-12",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-08-23",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 65.8,
+     "yield": 63.0,
+     "liquidity": 2.6,
+     "comfort": 0.0,
+     "yieldPct": 17.04,
+     "durationYears": 3.42,
+     "couponPct": 0.0
+    },
+    "total": 50.3,
+    "why": "высший/первый уровень листинга; доходность 17.04% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10G1T5",
+    "name": "СБСекр6АС",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2035-09-26",
+    "listLevel": 3,
+    "turnoverMn": 0.7,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 96.1,
+     "yield": 75.1,
+     "liquidity": 17.4,
+     "comfort": 77.0,
+     "yieldPct": 18.01,
+     "durationYears": 0.39,
+     "couponPct": 16.0
+    },
+    "total": 60.3,
+    "why": "короткая дюрация 0.39 г — почти не зависит от ставки; доходность 18.01% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10EA16",
+    "name": "ПочтаР3P03",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2036-01-22",
+    "listLevel": 3,
+    "turnoverMn": 0.3,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 81.3,
+     "yield": 88.5,
+     "liquidity": 3.1,
+     "comfort": 90.9,
+     "yieldPct": 19.08,
+     "durationYears": 1.87,
+     "couponPct": 17.75
+    },
+    "total": 59.9,
+    "why": "короткая дюрация 1.87 г — почти не зависит от ставки; доходность 19.08% выше ставки ЦБ; купон сопоставим со ставкой"
+   }
+  ],
+  "rateFree": [
+   {
+    "secid": "RU000A10G1T5",
+    "name": "СБСекр6АС",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2035-09-26",
+    "listLevel": 3,
+    "turnoverMn": 0.7,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 96.1,
+     "yield": 75.1,
+     "liquidity": 17.4,
+     "comfort": 77.0,
+     "yieldPct": 18.01,
+     "durationYears": 0.39,
+     "couponPct": 16.0
+    },
+    "total": 60.3,
+    "why": "короткая дюрация 0.39 г — почти не зависит от ставки; доходность 18.01% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A101QN1",
+    "name": "ГазпромКP4",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-05-25",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 94.4,
+     "yield": 49.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 15.92,
+     "durationYears": 0.56,
+     "couponPct": 5.9
+    },
+    "total": 52.1,
+    "why": "короткая дюрация 0.56 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 15.92% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10DZK8",
+    "name": "ПолипП2Б13",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-12-16",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 89.8,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 100.0,
+     "yieldPct": 42.94,
+     "durationYears": 1.02,
+     "couponPct": 19.45
+    },
+    "total": 74.0,
+    "why": "короткая дюрация 1.02 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 42.94% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10EAC6",
+    "name": "КАМАЗ БП20",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2028-02-06",
+    "listLevel": 2,
+    "turnoverMn": 0.5,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 88.4,
+     "yield": 67.5,
+     "liquidity": 12.5,
+     "comfort": 76.6,
+     "yieldPct": 17.4,
+     "durationYears": 1.16,
+     "couponPct": 15.95
+    },
+    "total": 65.1,
+    "why": "короткая дюрация 1.16 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 17.4% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10EA16",
+    "name": "ПочтаР3P03",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2036-01-22",
+    "listLevel": 3,
+    "turnoverMn": 0.3,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 81.3,
+     "yield": 88.5,
+     "liquidity": 3.1,
+     "comfort": 90.9,
+     "yieldPct": 19.08,
+     "durationYears": 1.87,
+     "couponPct": 17.75
+    },
+    "total": 59.9,
+    "why": "короткая дюрация 1.87 г — почти не зависит от ставки; доходность 19.08% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10CT33",
+    "name": "Атомэнпр08",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2030-09-17",
+    "listLevel": 2,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 70.1,
+     "yield": 48.9,
+     "liquidity": 0.0,
+     "comfort": 66.7,
+     "yieldPct": 15.91,
+     "durationYears": 2.99,
+     "couponPct": 14.7
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.91% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10DPS2",
+    "name": "Атомэнпр09",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-05-29",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 66.8,
+     "yield": 49.8,
+     "liquidity": 1.0,
+     "comfort": 69.8,
+     "yieldPct": 15.98,
+     "durationYears": 3.32,
+     "couponPct": 15.1
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.98% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10CMR3",
+    "name": "СибурХ1Р08",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2030-08-08",
+    "listLevel": 3,
+    "turnoverMn": 0.3,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 66.8,
+     "yield": 0.0,
+     "liquidity": 4.9,
+     "comfort": 2.8,
+     "yieldPct": 9.32,
+     "durationYears": 3.32,
+     "couponPct": 6.65
+    },
+    "total": 26.4,
+    "why": "сбалансированный профиль"
+   },
+   {
+    "secid": "RU000A10G5K5",
+    "name": "ГПН005Р-12",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-08-23",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 65.8,
+     "yield": 63.0,
+     "liquidity": 2.6,
+     "comfort": 0.0,
+     "yieldPct": 17.04,
+     "durationYears": 3.42,
+     "couponPct": 0.0
+    },
+    "total": 50.3,
+    "why": "высший/первый уровень листинга; доходность 17.04% выше ставки ЦБ"
+   },
+   {
+    "secid": "SU26249RMFS1",
+    "name": "ОФЗ 26249",
+    "kind": "ofz",
+    "isOfz": true,
+    "maturity": "2032-06-16",
+    "listLevel": 1,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 95.0,
+     "rateFree": 59.6,
+     "yield": 50.7,
+     "liquidity": 0.0,
+     "comfort": 37.3,
+     "yieldPct": 16.06,
+     "durationYears": 4.04,
+     "couponPct": 11.0
+    },
+    "total": 56.8,
+    "why": "госгарантия (ОФЗ); доходность 16.06% выше ставки ЦБ"
+   }
+  ],
+  "yieldAbove": [
+   {
+    "secid": "RU000A10DZK8",
+    "name": "ПолипП2Б13",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-12-16",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 89.8,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 100.0,
+     "yieldPct": 42.94,
+     "durationYears": 1.02,
+     "couponPct": 19.45
+    },
+    "total": 74.0,
+    "why": "короткая дюрация 1.02 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 42.94% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10EA16",
+    "name": "ПочтаР3P03",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2036-01-22",
+    "listLevel": 3,
+    "turnoverMn": 0.3,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 81.3,
+     "yield": 88.5,
+     "liquidity": 3.1,
+     "comfort": 90.9,
+     "yieldPct": 19.08,
+     "durationYears": 1.87,
+     "couponPct": 17.75
+    },
+    "total": 59.9,
+    "why": "короткая дюрация 1.87 г — почти не зависит от ставки; доходность 19.08% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10G1T5",
+    "name": "СБСекр6АС",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2035-09-26",
+    "listLevel": 3,
+    "turnoverMn": 0.7,
+    "scores": {
+     "reliability": 40.0,
+     "rateFree": 96.1,
+     "yield": 75.1,
+     "liquidity": 17.4,
+     "comfort": 77.0,
+     "yieldPct": 18.01,
+     "durationYears": 0.39,
+     "couponPct": 16.0
+    },
+    "total": 60.3,
+    "why": "короткая дюрация 0.39 г — почти не зависит от ставки; доходность 18.01% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A10EAC6",
+    "name": "КАМАЗ БП20",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2028-02-06",
+    "listLevel": 2,
+    "turnoverMn": 0.5,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 88.4,
+     "yield": 67.5,
+     "liquidity": 12.5,
+     "comfort": 76.6,
+     "yieldPct": 17.4,
+     "durationYears": 1.16,
+     "couponPct": 15.95
+    },
+    "total": 65.1,
+    "why": "короткая дюрация 1.16 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 17.4% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10G5K5",
+    "name": "ГПН005Р-12",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-08-23",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 65.8,
+     "yield": 63.0,
+     "liquidity": 2.6,
+     "comfort": 0.0,
+     "yieldPct": 17.04,
+     "durationYears": 3.42,
+     "couponPct": 0.0
+    },
+    "total": 50.3,
+    "why": "высший/первый уровень листинга; доходность 17.04% выше ставки ЦБ"
+   },
+   {
+    "secid": "SU26246RMFS7",
+    "name": "ОФЗ 26246",
+    "kind": "ofz",
+    "isOfz": true,
+    "maturity": "2036-03-12",
+    "listLevel": 1,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 95.0,
+     "rateFree": 46.0,
+     "yield": 58.2,
+     "liquidity": 0.0,
+     "comfort": 45.2,
+     "yieldPct": 16.66,
+     "durationYears": 5.4,
+     "couponPct": 12.0
+    },
+    "total": 56.8,
+    "why": "госгарантия (ОФЗ); доходность 16.66% выше ставки ЦБ"
+   },
+   {
+    "secid": "SU26249RMFS1",
+    "name": "ОФЗ 26249",
+    "kind": "ofz",
+    "isOfz": true,
+    "maturity": "2032-06-16",
+    "listLevel": 1,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 95.0,
+     "rateFree": 59.6,
+     "yield": 50.7,
+     "liquidity": 0.0,
+     "comfort": 37.3,
+     "yieldPct": 16.06,
+     "durationYears": 4.04,
+     "couponPct": 11.0
+    },
+    "total": 56.8,
+    "why": "госгарантия (ОФЗ); доходность 16.06% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10DPS2",
+    "name": "Атомэнпр09",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2031-05-29",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 66.8,
+     "yield": 49.8,
+     "liquidity": 1.0,
+     "comfort": 69.8,
+     "yieldPct": 15.98,
+     "durationYears": 3.32,
+     "couponPct": 15.1
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.98% выше ставки ЦБ; купон сопоставим со ставкой"
+   },
+   {
+    "secid": "RU000A101QN1",
+    "name": "ГазпромКP4",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2027-05-25",
+    "listLevel": 2,
+    "turnoverMn": 0.2,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 94.4,
+     "yield": 49.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 15.92,
+     "durationYears": 0.56,
+     "couponPct": 5.9
+    },
+    "total": 52.1,
+    "why": "короткая дюрация 0.56 г — почти не зависит от ставки; высший/первый уровень листинга; доходность 15.92% выше ставки ЦБ"
+   },
+   {
+    "secid": "RU000A10CT33",
+    "name": "Атомэнпр08",
+    "kind": "bond",
+    "isOfz": false,
+    "maturity": "2030-09-17",
+    "listLevel": 2,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 70.0,
+     "rateFree": 70.1,
+     "yield": 48.9,
+     "liquidity": 0.0,
+     "comfort": 66.7,
+     "yieldPct": 15.91,
+     "durationYears": 2.99,
+     "couponPct": 14.7
+    },
+    "total": 53.9,
+    "why": "высший/первый уровень листинга; доходность 15.91% выше ставки ЦБ; купон сопоставим со ставкой"
+   }
+  ],
+  "dividend": [
+   {
+    "secid": "SIBN",
+    "name": "Газпрнефть",
+    "kind": "share",
+    "price": 571.2,
+    "maturity": null,
+    "listLevel": 3,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 97.8,
+     "rateFree": 100.0,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 24.85,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 2708.2,
+     "divPerShare": 155.64
+    },
+    "total": 79.3,
+    "why": "дивидендная доходность 24.85% — денежный поток не привязан к ставке; крупная капитализация (2708.2 млрд ₽); выплачено 155.64 ₽/акцию за год"
+   },
+   {
+    "secid": "NVTK",
+    "name": "Новатэк ао",
+    "kind": "share",
+    "price": 1144.2,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 100.0,
+     "rateFree": 68.6,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 14.41,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 3474.1,
+     "divPerShare": 153.73
+    },
+    "total": 73.7,
+    "why": "дивидендная доходность 14.41% — денежный поток не привязан к ставке; крупная капитализация (3474.1 млрд ₽); выплачено 153.73 ₽/акцию за год"
+   },
+   {
+    "secid": "SBER",
+    "name": "Сбербанк",
+    "kind": "share",
+    "price": 291.3,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 100.0,
+     "rateFree": 64.6,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 13.57,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 6288.3,
+     "divPerShare": 37.64
+    },
+    "total": 72.9,
+    "why": "дивидендная доходность 13.57% — денежный поток не привязан к ставке; крупная капитализация (6288.3 млрд ₽); выплачено 37.64 ₽/акцию за год"
+   },
+   {
+    "secid": "TATN",
+    "name": "Татнфт 3ао",
+    "kind": "share",
+    "price": 621.3,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 82.7,
+     "rateFree": 83.4,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 17.51,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 1353.6,
+     "divPerShare": 118.38
+    },
+    "total": 71.5,
+    "why": "дивидендная доходность 17.51% — денежный поток не привязан к ставке; крупная капитализация (1353.6 млрд ₽); выплачено 118.38 ₽/акцию за год"
+   },
+   {
+    "secid": "X5",
+    "name": "КЦ ИКС 5",
+    "kind": "share",
+    "price": 2226.5,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 65.2,
+     "rateFree": 100.0,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 28.53,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 604.7,
+     "divPerShare": 613.0
+    },
+    "total": 69.6,
+    "why": "дивидендная доходность 28.53% — денежный поток не привязан к ставке; крупная капитализация (604.7 млрд ₽); выплачено 613.0 ₽/акцию за год"
+   },
+   {
+    "secid": "VTBR",
+    "name": "ВТБ ао",
+    "kind": "share",
+    "price": 56.7,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 69.4,
+     "rateFree": 78.4,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 16.46,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 733.1,
+     "divPerShare": 9.71
+    },
+    "total": 66.5,
+    "why": "дивидендная доходность 16.46% — денежный поток не привязан к ставке; крупная капитализация (733.1 млрд ₽); выплачено 9.71 ₽/акцию за год"
+   },
+   {
+    "secid": "MTSS",
+    "name": "МТС-ао",
+    "kind": "share",
+    "price": 175.1,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 53.3,
+     "rateFree": 79.7,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 16.73,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 349.9,
+     "divPerShare": 35.0
+    },
+    "total": 61.9,
+    "why": "дивидендная доходность 16.73% — денежный поток не привязан к ставке; выплачено 35.0 ₽/акцию за год"
+   },
+   {
+    "secid": "TRNFP",
+    "name": "Транснф ап",
+    "kind": "share",
+    "price": 1055.8,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 36.9,
+     "rateFree": 86.0,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 18.07,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 164.2,
+     "divPerShare": 204.17
+    },
+    "total": 58.3,
+    "why": "дивидендная доходность 18.07% — денежный поток не привязан к ставке; выплачено 204.17 ₽/акцию за год"
+   },
+   {
+    "secid": "SBERP",
+    "name": "Сбербанк-п",
+    "kind": "share",
+    "price": 291.34,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.1,
+    "scores": {
+     "reliability": 49.4,
+     "rateFree": 64.0,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 13.45,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 291.3,
+     "divPerShare": 37.64
+    },
+    "total": 57.6,
+    "why": "дивидендная доходность 13.45% — денежный поток не привязан к ставке; выплачено 37.64 ₽/акцию за год"
+   },
+   {
+    "secid": "AFLT",
+    "name": "Аэрофлот",
+    "kind": "share",
+    "price": 35.59,
+    "maturity": null,
+    "listLevel": 1,
+    "turnoverMn": 0.0,
+    "scores": {
+     "reliability": 33.7,
+     "rateFree": 73.4,
+     "yield": 100.0,
+     "liquidity": 0.0,
+     "comfort": 0.0,
+     "yieldPct": 15.41,
+     "durationYears": null,
+     "couponPct": null,
+     "cap": 141.5,
+     "divPerShare": 5.29
+    },
+    "total": 54.8,
+    "why": "дивидендная доходность 15.41% — денежный поток не привязан к ставке; выплачено 5.29 ₽/акцию за год"
+   }
+  ]
+ }
+}

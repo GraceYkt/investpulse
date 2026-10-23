@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Activity, PieChart, Lightbulb, Radio, RefreshCw, BarChart3, CloudDownload, KeyRound } from 'lucide-react';
+import { Activity, PieChart, Lightbulb, Radio, RefreshCw, BarChart3, CloudDownload, KeyRound, Search } from 'lucide-react';
 import { DATA_AS_OF, POSITIONS } from '@/data/portfolio';
 import { buildPortfolioSignals, buildRiskSignals, portfolioHistory, totals } from '@/lib/portfolio';
 import {
@@ -18,6 +18,7 @@ import RiskSignals from '@/sections/RiskSignals';
 import PortfolioSection from '@/sections/PortfolioSection';
 import IdeasSection from '@/sections/IdeasSection';
 import AnalysisSection from '@/sections/AnalysisSection';
+import ScreenerSection from '@/sections/ScreenerSection';
 
 interface QuoteUpdate {
   id: string;
@@ -328,6 +329,9 @@ export default function Home() {
             <TabsTrigger value="analysis" className="gap-1.5">
               <BarChart3 className="h-4 w-4" /> Аналитика
             </TabsTrigger>
+            <TabsTrigger value="screener" className="gap-1.5">
+              <Search className="h-4 w-4" /> Скринер
+            </TabsTrigger>
           </TabsList>
 
           <div className="ml-auto flex items-center gap-3">
@@ -425,6 +429,10 @@ export default function Home() {
 
         <TabsContent value="analysis">
           <AnalysisSection />
+        </TabsContent>
+
+        <TabsContent value="screener">
+          <ScreenerSection />
         </TabsContent>
       </main>
 
