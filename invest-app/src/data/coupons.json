@@ -14,6 +14,11 @@
   "nextValueRub": 29.42,
   "perYear": 3
  },
+ "SU26236RMFS8": {
+  "nextDate": "2026-11-18",
+  "nextValueRub": 28.42,
+  "perYear": 3
+ },
  "SU26239RMFS2": {
   "nextDate": "2027-01-27",
   "nextValueRub": 34.41,
@@ -27,6 +32,11 @@
  "SU26247RMFS5": {
   "nextDate": "2026-11-25",
   "nextValueRub": 61.08,
+  "perYear": 3
+ },
+ "SU26251RMFS7": {
+  "nextDate": "2027-03-03",
+  "nextValueRub": 47.37,
   "perYear": 3
  },
  "SU26252RMFS5": {

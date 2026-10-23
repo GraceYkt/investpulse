@@ -151,7 +151,7 @@ export default function Home() {
           <div>
             <h1 className="text-base font-bold leading-tight">ИнвестПульс</h1>
             <p className="text-[11px] leading-tight text-muted-foreground">
-              портфель Т-Банк · сделки 12.10.2026 · отчёт по 19.10.2026
+              портфель Т-Банк · актуально на 23.10.2026
             </p>
           </div>
           <Badge variant="outline" className="ml-1 hidden border-emerald-500/40 bg-emerald-500/10 text-emerald-300 lg:inline-flex">
