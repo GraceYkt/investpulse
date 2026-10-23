@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {
   Search, Target, Activity, TrendingDown, Minus, TrendingUp, Gauge,
-  ShoppingCart, Sparkles, Wallet, Landmark, Info, RefreshCw,
+  ShoppingCart, Sparkles, Wallet, Landmark, Info, RefreshCw, ShieldCheck,
 } from 'lucide-react';
 import analytics from '@/data/pick-analytics.json';
 import { fmtDate } from '@/lib/portfolio';
@@ -299,18 +299,71 @@ export default function AnalysisSection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, type, snaps]);
 
-  const byRank = useMemo(() => {
+  // Два блока: зависимые от ставки ЦБ (чувствит. высокая/средняя) и независимые (низкая)
+  const dependent = useMemo(() => {
     const m = new Map<number, Item[]>();
     for (const it of filtered) {
+      if (it.sensitivity === 'низкая') continue;
       const arr = m.get(it.rank) ?? [];
       arr.push(it);
       m.set(it.rank, arr);
     }
-    // внутри каждой идеи — по рейтингу (доходность по убыванию)
     return Array.from(m.entries())
       .sort((a, b) => a[0] - b[0])
       .map(([rank, arr]) => [rank, [...arr].sort((x, y) => rating(y) - rating(x))] as [number, Item[]]);
   }, [filtered]);
+
+  const independent = useMemo(() => {
+    const m = new Map<number, Item[]>();
+    for (const it of filtered) {
+      if (it.sensitivity !== 'низкая') continue;
+      const arr = m.get(it.rank) ?? [];
+      arr.push(it);
+      m.set(it.rank, arr);
+    }
+    return Array.from(m.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([rank, arr]) => [rank, [...arr].sort((x, y) => rating(y) - rating(x))] as [number, Item[]]);
+  }, [filtered]);
+
+  const renderGroup = ([rank, items]: [number, Item[]], n: number) => (
+    <div key={rank} className="panel overflow-hidden rounded-xl">
+      <div className="border-b border-border/60 px-4 py-2.5">
+        <span className="text-sm font-semibold">
+          {n}. {items[0].ideaTitle}
+        </span>
+        <span className="ml-2 text-[11px] text-muted-foreground">
+          топ-{items.length} по рейтингу (доходность)
+        </span>
+      </div>
+      <div className="grid gap-2 p-2">
+        {items.map((it, idx) => (
+          <button
+            key={it.key}
+            onClick={() => setOpen(it)}
+            className="rounded-lg border border-border/50 p-2.5 text-left transition-colors hover:border-indigo-400/40 hover:bg-muted/20"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold tabular-nums">
+                  {idx + 1}
+                </span>
+                <span className="truncate text-xs font-semibold">{it.name}</span>
+              </span>
+              <Badge variant="outline" className="shrink-0 text-[10px]">{it.assetType}</Badge>
+            </div>
+            <p className="mt-1 truncate text-[11px] text-muted-foreground">{metricLine(it)}</p>
+            <div className="mt-1.5 flex items-center justify-between">
+              <span className={`rounded border px-1.5 py-0.5 text-[10px] ${SENS_STYLE[it.sensitivity]}`}>
+                чувствит. к ставке: {it.sensitivity}
+              </span>
+              <span className="text-[10px] text-indigo-300">анализ →</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-3">
@@ -360,45 +413,46 @@ export default function AnalysisSection() {
         </div>
       </div>
 
-      {/* Список по идеям */}
-      {byRank.map(([rank, items]) => (
-        <div key={rank} className="panel overflow-hidden rounded-xl">
-          <div className="border-b border-border/60 px-4 py-2.5">
-            <span className="text-sm font-semibold">
-              #{rank} · {items[0].ideaTitle}
-            </span>
-            <span className="ml-2 text-[11px] text-muted-foreground">
-              топ-{items.length} по рейтингу (доходность)
-            </span>
+      {/* Два блока: зависимые vs независимые от ставки */}
+      <div className="grid items-start gap-4 xl:grid-cols-2">
+        <div className="space-y-3">
+          <div className="rounded-xl border border-red-500/25 bg-red-500/5 p-3">
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+              <TrendingUp className="h-4 w-4 text-red-400" /> Зависимые от ставки ЦБ
+            </h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Чувствительность высокая и средняя: цена и доход этих бумаг сильно зависят от решений ЦБ —
+              работают на сценарий снижения ставки, но проседают при её росте.
+            </p>
           </div>
-          <div className="grid gap-2 p-2 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((it, idx) => (
-              <button
-                key={it.key}
-                onClick={() => setOpen(it)}
-                className="rounded-lg border border-border/50 p-2.5 text-left transition-colors hover:border-indigo-400/40 hover:bg-muted/20"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold tabular-nums">
-                      {idx + 1}
-                    </span>
-                    <span className="truncate text-xs font-semibold">{it.name}</span>
-                  </span>
-                  <Badge variant="outline" className="shrink-0 text-[10px]">{it.assetType}</Badge>
-                </div>
-                <p className="mt-1 truncate text-[11px] text-muted-foreground">{metricLine(it)}</p>
-                <div className="mt-1.5 flex items-center justify-between">
-                  <span className={`rounded border px-1.5 py-0.5 text-[10px] ${SENS_STYLE[it.sensitivity]}`}>
-                    чувствит. к ставке: {it.sensitivity}
-                  </span>
-                  <span className="text-[10px] text-indigo-300">анализ →</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          {dependent.length === 0 ? (
+            <div className="panel rounded-xl p-5 text-center text-xs text-muted-foreground">
+              Нет инструментов под текущими фильтрами.
+            </div>
+          ) : (
+            dependent.map(([rank, items], i) => renderGroup([rank, items], i + 1))
+          )}
         </div>
-      ))}
+
+        <div className="space-y-3">
+          <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3">
+            <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+              <ShieldCheck className="h-4 w-4 text-emerald-400" /> Не зависимые от ставки ЦБ
+            </h3>
+            <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+              Чувствительность низкая: купоны, дивиденды и погашение формируют доход сами по себе —
+              бумага не «переоценивается» вместе со ставкой.
+            </p>
+          </div>
+          {independent.length === 0 ? (
+            <div className="panel rounded-xl p-5 text-center text-xs text-muted-foreground">
+              Нет инструментов под текущими фильтрами.
+            </div>
+          ) : (
+            independent.map(([rank, items], i) => renderGroup([rank, items], i + 1))
+          )}
+        </div>
+      </div>
 
       {filtered.length === 0 && (
         <div className="panel rounded-xl p-6 text-center text-sm text-muted-foreground">
