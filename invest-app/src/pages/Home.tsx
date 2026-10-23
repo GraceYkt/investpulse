@@ -9,6 +9,7 @@ import { DATA_AS_OF, POSITIONS } from '@/data/portfolio';
 import { buildPortfolioSignals, buildRiskSignals, portfolioHistory, totals } from '@/lib/portfolio';
 import {
   fetchBrokerPortfolio, getBrokerToken, saveBrokerToken, type BrokerHolding,
+  isCloudHost, getGhToken, saveGhToken, dispatchCloudSync, cloudRunStatus,
 } from '@/lib/brokerSync';
 import type { Position } from '@/types/portfolio';
 import OverviewCards from '@/sections/OverviewCards';
@@ -58,7 +59,60 @@ export default function Home() {
   const [brokerSyncing, setBrokerSyncing] = useState(false);
   const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   const [tokenDraft, setTokenDraft] = useState('');
+  const [ghDialogOpen, setGhDialogOpen] = useState(false);
+  const [ghDraft, setGhDraft] = useState('');
   const autoSyncRan = useRef(false);
+
+  // Облачная синхрониза: диспатчим workflow и ждём завершения, затем перезагрузка
+  const cloudSync = async () => {
+    const gh = getGhToken();
+    if (!gh) {
+      setGhDraft('');
+      setGhDialogOpen(true);
+      return;
+    }
+    setSyncState('running');
+    setSyncMsg('Запускаю синхронизацию в облаке GitHub (обращение к банку идёт с сервера — в браузере оно заблокировано CORS)…');
+    let runId: number;
+    try {
+      runId = await dispatchCloudSync(gh);
+    } catch (e) {
+      setSyncState('error');
+      setSyncMsg(`Не удалось запустить синхронизацию: ${e instanceof Error ? e.message : e}. Проверьте токен GitHub (значок ключа рядом).`);
+      return;
+    }
+    const started = Date.now();
+    const poll = async (): Promise<void> => {
+      let st: 'running' | 'success' | 'failure';
+      try {
+        st = await cloudRunStatus(gh, runId);
+      } catch {
+        st = 'running'; // временные сбои API — просто ждём дальше
+      }
+      if (st === 'running') {
+        if (Date.now() - started > 12 * 60 * 1000) {
+          setSyncState('error');
+          setSyncMsg('Синхронизация в облаке идёт дольше 12 минут. Проверьте статус позже — страница сама обновится, когда GitHub опубликует данные.');
+          return;
+        }
+        setSyncMsg('Синхронизация в облаке выполняется: банк → MOEX → купоны → сборка → публикация…');
+        await new Promise((r) => setTimeout(r, 8000));
+        return poll();
+      }
+      if (st === 'success') {
+        setSyncState('done');
+        setSyncMsg('Синхронизация завершена, обновляю страницу…');
+        setTimeout(() => window.location.reload(), 3000);
+      } else {
+        setSyncState('error');
+        setSyncMsg('Синхронизация в облаке завершилась с ошибкой. Попробуйте ещё раз — если банк недоступен, данные останутся прежними.');
+      }
+    };
+    await poll().catch(() => {
+      setSyncState('error');
+      setSyncMsg('Не удалось отследить синхронизацию (сбой GitHub API). Данные на сайте обновляются автоматически каждый час.');
+    });
+  };
 
   // Кнопка «Синхронизировать API»: локальный сервер (sync-server.bat) гоняет
   // цепочку sync_broker → MOEX → купоны → сборка; здесь только следим за статусом.
@@ -163,24 +217,27 @@ export default function Home() {
     }
   };
 
-  // При открытии страницы — сразу обращаемся в банк (если токен сохранён в браузере)
+  // При открытии страницы — обращаемся в банк напрямую, только если сайт
+  // открыт локально (с облачного хоста браузеру банк недоступен — CORS)
   useEffect(() => {
     if (autoSyncRan.current) return;
     autoSyncRan.current = true;
-    if (getBrokerToken()) directBrokerSync(true);
+    if (!isCloudHost() && getBrokerToken()) directBrokerSync(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSyncClick = async () => {
+    if (isCloudHost()) {
+      await cloudSync();
+      return;
+    }
     if (!getBrokerToken()) {
       setTokenDraft('');
       setTokenDialogOpen(true);
       return;
     }
     const ok = await directBrokerSync(false);
-    if (!ok && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-      await syncApi(); // запасной путь: локальный сервер (sync-server.bat)
-    }
+    if (!ok) await syncApi(); // запасной путь: локальный сервер (sync-server.bat)
   };
 
   useEffect(() => {
@@ -290,7 +347,9 @@ export default function Home() {
               onClick={onSyncClick}
               disabled={syncState === 'running' || brokerSyncing}
               className="gap-1.5"
-              title="Синхронизировать портфель напрямую с брокерским счётом через Т-Инвестиции API (токен сохраняется только в вашем браузере)"
+              title={isCloudHost()
+                ? 'Запустить синхронизацию портфеля в облаке GitHub (банк, MOEX, аналитика) и обновить страницу'
+                : 'Синхронизировать портфель напрямую с брокерским счётом через Т-Инвестиции API (токен сохраняется только в вашем браузере)'}
             >
               <CloudDownload className={`h-3.5 w-3.5 ${syncState === 'running' || brokerSyncing ? 'animate-bounce' : ''}`} />
               <span className="hidden sm:inline">
@@ -301,10 +360,17 @@ export default function Home() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                setTokenDraft(getBrokerToken());
-                setTokenDialogOpen(true);
+                if (isCloudHost()) {
+                  setGhDraft(getGhToken());
+                  setGhDialogOpen(true);
+                } else {
+                  setTokenDraft(getBrokerToken());
+                  setTokenDialogOpen(true);
+                }
               }}
-              title={getBrokerToken() ? 'Токен Т-Инвестиции API сохранён (нажмите, чтобы заменить)' : 'Ввести токен Т-Инвестиции API (только чтение)'}
+              title={isCloudHost()
+                ? (getGhToken() ? 'Токен GitHub сохранён (нажмите, чтобы заменить)' : 'Ввести токен GitHub — нужен для кнопки синхронизации в облаке')
+                : (getBrokerToken() ? 'Токен Т-Инвестиции API сохранён (нажмите, чтобы заменить)' : 'Ввести токен Т-Инвестиции API (только чтение)')}
               className={`h-8 w-8 px-0 ${getBrokerToken() ? 'text-emerald-400' : 'text-muted-foreground'}`}
             >
               <KeyRound className="h-3.5 w-3.5" />
@@ -361,6 +427,47 @@ export default function Home() {
           <AnalysisSection />
         </TabsContent>
       </main>
+
+      {/* Диалог ввода токена GitHub (для облачной синхронизации) */}
+      <Dialog open={ghDialogOpen} onOpenChange={setGhDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Токен GitHub (для синхронизации в облаке)</DialogTitle>
+            <DialogDescription>
+              Браузеру запрещено обращаться к банку напрямую (CORS), поэтому на опубликованном
+              сайте кнопка синхронизации запускает облачный workflow, который сам обращается к
+              банку с сервера GitHub. Для этого нужен токен GitHub с правом запуска Actions.
+              Хранится только в браузере этого устройства. Создать: github.com → Settings →
+              Developer settings → Personal access tokens (классический) → scope «repo» и «workflow».
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Input
+              type="password"
+              placeholder="ghp_XXXX… или github_pat_…"
+              value={ghDraft}
+              onChange={(e) => setGhDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && ghDraft.trim()) {
+                  saveGhToken(ghDraft);
+                  setGhDialogOpen(false);
+                  cloudSync();
+                }
+              }}
+            />
+            <Button
+              disabled={!ghDraft.trim()}
+              onClick={() => {
+                saveGhToken(ghDraft);
+                setGhDialogOpen(false);
+                cloudSync();
+              }}
+            >
+              Сохранить
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Диалог ввода токена Т-Инвестиции API */}
       <Dialog open={tokenDialogOpen} onOpenChange={setTokenDialogOpen}>
