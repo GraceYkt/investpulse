@@ -61,23 +61,23 @@ def api_post(token, path, payload=None):
             'Content-Type': 'application/json',
         },
     )
-    # прокси периодически отдаёт ложный 404 — повторяем с паузой
+    # прокси периодически «выпадает» ложным 404 (сбой шлюза банка) — долгие повторы: до ~4,5 мин
     last_err = None
-    for attempt in range(5):
+    for attempt in range(12):
         try:
             with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
                 return json.loads(r.read().decode('utf-8'))
         except urllib.error.HTTPError as e:
             detail = e.read().decode('utf-8', 'replace')[:300]
             last_err = RuntimeError(f'API {path}: HTTP {e.code} — {detail}')
-            if e.code in (404, 502, 503) and attempt < 4:
-                time.sleep(3 * (attempt + 1))
+            if e.code in (404, 500, 502, 503) and attempt < 11:
+                time.sleep(min(25, 4 * (attempt + 1)))
                 continue
             raise last_err
         except (urllib.error.URLError, TimeoutError) as e:
             last_err = RuntimeError(f'API {path}: сеть — {e}')
-            if attempt < 4:
-                time.sleep(3 * (attempt + 1))
+            if attempt < 11:
+                time.sleep(min(25, 4 * (attempt + 1)))
                 continue
             raise last_err
     raise last_err
