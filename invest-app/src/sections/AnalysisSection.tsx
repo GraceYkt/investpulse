@@ -66,13 +66,25 @@ function scenarioProfit(it: Item, scen: 'down' | 'flat' | 'up'): string {
     const dmod = it.modDuration ?? 0;
     const ytm = it.yield ?? 0;
     const hold = it.matdate ? `держим до погашения ${fmtDate(it.matdate)}` : 'держим до оферты';
-    if (scen === 'down') return `${num(dmod * 2)} к цене · ${hold}`;
+    // сценарий «ставка упадёт на 2 п.п. в течение года»:
+    // годовых = купонная доходность + разовый рост цены, размазанный на год
+    if (scen === 'down') return `${num(dmod * 2)} к цене · итого ≈${num(ytm + dmod * 2)} годовых (купон + рост цены) · ${hold}`;
     if (scen === 'flat') return `~${num(ytm, false)} годовых · ${hold}`;
     return `−${num(dmod * 2).slice(1)} если продать · ${hold} — убытка нет`;
   }
-  if (it.kind === 'deposit') return 'доходность зафиксирована · держим до конца срока вклада';
-  if (it.kind === 'fund') return 'доходность следом за ставкой · держим до появления идеи';
-  return 'горизонт 12+ мес. · держим до снижения ставки ЦБ';
+  if (it.kind === 'deposit') {
+    const m = (it.desc ?? '').match(/(\d+(?:[.,]\d+)?)\s*%/);
+    const rate = m ? ` ≈${m[1]} годовых` : '';
+    return `доходность зафиксирована${rate} · держим до конца срока вклада`;
+  }
+  if (it.kind === 'fund') {
+    const m = (it.desc ?? '').match(/(\d+(?:[.,]\d+)?)\s*%/);
+    const rate = m ? ` ≈${m[1]} годовых` : '';
+    return `доходность следом за ставкой${rate} · держим до появления идеи`;
+  }
+  const m = (it.desc ?? '').match(/(\d+(?:[.,]\d+)?)\s*%/);
+  const rate = m ? ` ≈${m[1]} годовых` : '';
+  return `горизонт 12+ мес.${rate} · держим до снижения ставки ЦБ`;
 }
 
 function ScenarioBlock({
