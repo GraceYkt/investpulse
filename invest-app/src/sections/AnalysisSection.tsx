@@ -70,7 +70,12 @@ function scenarioProfit(it: Item, scen: 'down' | 'flat' | 'up'): string {
     // годовых = купонная доходность + разовый рост цены, размазанный на год
     if (scen === 'down') return `${num(dmod * 2)} к цене · итого ≈${num(ytm + dmod * 2)} годовых (купон + рост цены) · ${hold}`;
     if (scen === 'flat') return `~${num(ytm, false)} годовых · ${hold}`;
-    return `−${num(dmod * 2).slice(1)} если продать · ${hold} — убытка нет`;
+    // ставка выросла на 2 п.п.: цена упала, но купон компенсирует, пока держим
+    const netAnnual = ytm - dmod * 2;
+    const netTxt = netAnnual >= 0
+      ? `пока держим: ≈${num(netAnnual)} годовых (купон перекрывает падение)`
+      : `пока держим: ≈${num(netAnnual)} годовых (убыток)`;
+    return `−${num(dmod * 2).slice(1)} к цене · ${netTxt} · ${hold} — убытка нет`;
   }
   if (it.kind === 'deposit') {
     const m = (it.desc ?? '').match(/(\d+(?:[.,]\d+)?)\s*%/);
