@@ -264,11 +264,15 @@ export default function Home() {
   );
   const criticalCount = signals.filter((s) => s.level === 'critical').length;
 
+  // актуальный список позиций для асинхронных обновлений (без устаревших замыканий)
+  const positionsRef = useRef<Position[]>(positions);
+  positionsRef.current = positions;
+
   const refreshQuotes = async () => {
     setRefreshing(true);
     setRefreshError(false);
     try {
-      const updates = (await Promise.all(positions.map((p) => fetchLatestQuote(p.id)))).filter(
+      const updates = (await Promise.all(positionsRef.current.map((p) => fetchLatestQuote(p.id)))).filter(
         (u): u is QuoteUpdate => u !== null,
       );
       if (!updates.length) throw new Error('no data');
@@ -287,6 +291,16 @@ export default function Home() {
       setRefreshing(false);
     }
   };
+
+  // При открытии страницы сразу тянем живые котировки с MOEX —
+  // пончик, показатели и график сразу актуальные, без ручных кнопок.
+  // Далее — автоповтор каждые 10 минут, пока вкладка открыта.
+  useEffect(() => {
+    refreshQuotes();
+    const timer = setInterval(refreshQuotes, 10 * 60 * 1000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggle = (id: string) =>
     setSelectedIds((prev) => {
@@ -394,8 +408,8 @@ export default function Home() {
           {(lastRefresh || refreshError) && (
             <div className="w-full text-right text-[11px] text-muted-foreground">
               {refreshError
-                ? 'Не удалось обновить котировки (проверьте сеть). Показаны данные от ' + DATA_AS_OF
-                : `Котировки обновлены в ${lastRefresh} (MOEX). После перезагрузки страницы — данные от ${DATA_AS_OF}`}
+                ? 'Живые котировки MOEX сейчас недоступны (выходной/сеть). Показаны данные от ' + DATA_AS_OF
+                : `Котировки живые, обновлены в ${lastRefresh} (MOEX) · сайт пересобирается ежечасно`}
             </div>
           )}
           {syncMsg && (
