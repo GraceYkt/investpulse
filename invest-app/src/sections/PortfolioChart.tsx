@@ -106,7 +106,7 @@ export default function PortfolioChart({ history, investedBaseline, height = 400
         <div>
           <div className="text-sm font-semibold">Динамика стоимости портфеля</div>
           <div className="text-xs text-muted-foreground">
-            Сентябрь 2026 — сегодня · колёсико мыши или слайдер внизу — приближение по времени
+            С момента покупки · колёсико мыши или слайдер внизу — приближение по времени
           </div>
         </div>
         <div className={`text-lg font-bold tabular-nums ${rising ? 'text-emerald-400' : 'text-red-400'}`}>

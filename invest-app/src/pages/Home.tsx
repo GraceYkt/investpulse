@@ -251,11 +251,13 @@ export default function Home() {
   );
 
   const t = useMemo(() => totals(selected), [selected]);
-  // График показывает период с сентября 2026 по сегодня
-  const history = useMemo(
-    () => portfolioHistory(selected).filter((h) => h.date >= '2026-09'),
-    [selected],
-  );
+  // График — с момента самой ранней покупки выбранных позиций
+  const history = useMemo(() => {
+    const pts = portfolioHistory(selected);
+    if (!selected.length) return pts;
+    const earliest = selected.reduce((m, p) => (p.buyDate < m ? p.buyDate : m), selected[0].buyDate);
+    return pts.filter((h) => h.date >= earliest);
+  }, [selected]);
   const signals = useMemo(
     () => [...buildRiskSignals(positions), ...buildPortfolioSignals(positions)],
     [positions],
