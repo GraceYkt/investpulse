@@ -251,7 +251,11 @@ export default function Home() {
   );
 
   const t = useMemo(() => totals(selected), [selected]);
-  const history = useMemo(() => portfolioHistory(selected), [selected]);
+  // График показывает период с сентября 2026 по сегодня
+  const history = useMemo(
+    () => portfolioHistory(selected).filter((h) => h.date >= '2026-09'),
+    [selected],
+  );
   const signals = useMemo(
     () => [...buildRiskSignals(positions), ...buildPortfolioSignals(positions)],
     [positions],
@@ -412,9 +416,10 @@ export default function Home() {
 
         <OverviewCards t={t} positions={selected} />
 
-        <PortfolioChart history={history} investedBaseline={t.invested} />
-
         <TabsContent value="portfolio">
+          <div className="mb-4">
+            <PortfolioChart history={history} investedBaseline={t.invested} />
+          </div>
           <PortfolioSection
             positions={positions}
             selectedIds={selectedIds}
