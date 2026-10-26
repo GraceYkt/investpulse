@@ -46,7 +46,7 @@ export function dayChange(p: Position): number {
 }
 
 /** Сложный процент: годовая доходность от цены покупки до текущей (CAGR) */
-export function cagr(p: Position, now = new Date('2026-10-22')): number {
+export function cagr(p: Position, now = new Date('2026-10-26')): number {
   const buy = new Date(p.buyDate);
   const years = (now.getTime() - buy.getTime()) / (365.25 * 24 * 3600 * 1000);
   if (years <= 0 || p.currentPrice <= 0 || p.avgBuyPrice <= 0) return 0;
@@ -74,7 +74,7 @@ export function totals(positions: Position[]): PortfolioTotals {
   const earliest = positions.length
     ? Math.min(...positions.map((p) => new Date(p.buyDate).getTime()))
     : Date.now();
-  const years = (new Date('2026-10-22').getTime() - earliest) / (365.25 * 24 * 3600 * 1000);
+  const years = (new Date('2026-10-26').getTime() - earliest) / (365.25 * 24 * 3600 * 1000);
   return {
     invested: inv,
     value: val,
@@ -87,16 +87,22 @@ export function totals(positions: Position[]): PortfolioTotals {
   };
 }
 
-/** Агрегированная дневная история стоимости выбранных позиций (по датам, forward-fill) */
+/** Агрегированная дневная история стоимости выбранных позиций.
+ * Только период владения: первая точка — фактически вложенная сумма на дату покупки,
+ * далее — рыночная стоимость по датам (forward-fill). */
 export function portfolioHistory(positions: Position[]): PricePoint[] {
   if (!positions.length) return [];
-  // Даты из самой длинной истории
-  const allDates = positions.reduce<string[]>(
-    (acc, p) => (p.history.length > acc.length ? p.history.map((h) => h.date) : acc),
-    [],
-  );
+  const buyDate = positions.reduce((m, p) => (p.buyDate < m ? p.buyDate : m), positions[0].buyDate);
+  const invested0 = positions.reduce((s, p) => s + invested(p), 0);
+  // Даты из самой длинной истории, но не раньше даты покупки
+  const allDates = positions
+    .reduce<string[]>(
+      (acc, p) => (p.history.length > acc.length ? p.history.map((h) => h.date) : acc),
+      [],
+    )
+    .filter((d) => d >= buyDate);
   const maps = positions.map((p) => new Map(p.history.map((h) => [h.date, h.price])));
-  const out: PricePoint[] = [];
+  const out: PricePoint[] = [{ date: buyDate, price: +invested0.toFixed(0) }];
   for (const date of allDates) {
     let sum = 0;
     let known = false;
