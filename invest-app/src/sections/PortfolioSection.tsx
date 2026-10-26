@@ -4,23 +4,10 @@ import type { EChartsOption } from 'echarts';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Position } from '@/types/portfolio';
 import {
-  cagr, fmtDate, fmtMoney, fmtNum, fmtPct, invested, marketValue, pnl, pnlPct, totals,
+  cagr, fmtDate, fmtMoney, fmtNum, fmtPct, invested, marketValue, pnl, pnlPct, totals, ytmOf,
 } from '@/lib/portfolio';
 import RecommendationsSection from '@/sections/RecommendationsSection';
-import moex from '@/data/moex-history.json';
 import { KEY_RATE } from '@/data/market';
-
-const MOEX = moex as Record<string, { yieldclose: number | null }>;
-
-/** Доходность к погашению, % годовых: реальная с MOEX, иначе оценка из параметров позиции. */
-function ytmOf(p: Position): number {
-  const y = MOEX[p.id]?.yieldclose;
-  if (y != null && y > 0) return y;
-  if (!p.durationDays || p.currentPrice <= 0) return 0;
-  const years = p.durationDays / 365;
-  const couponPerYear = p.couponPercent ? (p.couponPercent / 100) * 1000 : 0;
-  return (((1000 - p.currentPrice) / years + couponPerYear) / p.currentPrice) * 100;
-}
 
 interface Props {
   positions: Position[];

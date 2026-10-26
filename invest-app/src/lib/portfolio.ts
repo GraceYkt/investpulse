@@ -1,4 +1,17 @@
 import type { Position, PricePoint, RiskSignal } from '@/types/portfolio';
+import moex from '@/data/moex-history.json';
+
+const MOEX = moex as Record<string, { yieldclose: number | null }>;
+
+/** Доходность к погашению, % годовых: реальная с MOEX, иначе оценка из параметров позиции. */
+export function ytmOf(p: Position): number {
+  const y = MOEX[p.id]?.yieldclose;
+  if (y != null && y > 0) return y;
+  if (!p.durationDays || p.currentPrice <= 0) return 0;
+  const years = p.durationDays / 365;
+  const couponPerYear = p.couponPercent ? (p.couponPercent / 100) * 1000 : 0;
+  return (((1000 - p.currentPrice) / years + couponPerYear) / p.currentPrice) * 100;
+}
 
 const nfMoney = new Intl.NumberFormat('ru-RU', {
   style: 'currency', currency: 'RUB', maximumFractionDigits: 0,
@@ -105,15 +118,30 @@ export function buildRiskSignals(positions: Position[]): RiskSignal[] {
     const pct = pnlPct(p);
     const month = changeForPeriod(p, 21);
     const weight = t.weights.get(p.id) ?? 0;
+    const isBond = p.type === 'bond';
+    const ytm = isBond ? ytmOf(p) : 0;
+    // Стратегия «держим до погашения»: колебания цены облигации — не угроза денег,
+    // пока доходность к погашению положительная. Реальная угроза — только YTM < 0.
+    const priceRiskMatters = !isBond || ytm <= 0;
 
-    if (pct <= -25) {
+    // Критично: облигация, которую доводить до погашения нельзя — там реальный минус
+    if (isBond && ytm <= 0 && p.durationDays) {
+      signals.push({
+        positionId: p.id, ticker: p.ticker, level: 'critical',
+        title: 'К погашению — потеря денег',
+        detail: `Доходность к погашению ≈ ${ytm.toFixed(1)}% годовых: при удержании позиция принесёт убыток (цена покупки выше суммы погашения с учётом купонов).`,
+        action: 'Продать до погашения либо зафиксировать убыток осознанно',
+      });
+    }
+
+    if (priceRiskMatters && pct <= -25) {
       signals.push({
         positionId: p.id, ticker: p.ticker, level: 'critical',
         title: 'Критическая просадка',
         detail: `Позиция в минусе ${fmtPct(pct)} от цены покупки. Без тезиса на восстановление — удержание превращается в «отложенный убыток».`,
         action: 'Сократить минимум вдвое или закрыть полностью',
       });
-    } else if (pct <= -15 && month <= -8) {
+    } else if (priceRiskMatters && pct <= -15 && month <= -8) {
       signals.push({
         positionId: p.id, ticker: p.ticker, level: 'critical',
         title: 'Падение ускоряется',
@@ -121,14 +149,34 @@ export function buildRiskSignals(positions: Position[]): RiskSignal[] {
         action: 'Продать сейчас, вернуться после стабилизации',
       });
     }
+
+    // Концентрация: для ОФЗ — не угроза денег (госгарантия, держим до погашения);
+    // для корпоративных — реальный кредитный риск, критично от 30%.
     if (weight >= 30) {
+      if (p.sector === 'ОФЗ') {
+        signals.push({
+          positionId: p.id, ticker: p.ticker, level: 'warning',
+          title: 'Концентрация в одном ОФЗ',
+          detail: `Одна позиция — ${weight.toFixed(1)}% портфеля. У ОФЗ госгарантия и фиксированные выплаты: колебания цены до погашения денег не лишают. Это риск разнообразия по срокам, а не потери.`,
+          action: 'При пополнении распределять между разными выпусками и сроками',
+        });
+      } else {
+        signals.push({
+          positionId: p.id, ticker: p.ticker, level: 'critical',
+          title: 'Концентрационный риск',
+          detail: `Одна корпоративная позиция — ${weight.toFixed(1)}% портфеля. Просадка актива на 20% потянет весь портфель на ${(weight * 0.2).toFixed(1)}%, и это уже реальный убыток.`,
+          action: 'Снизить долю до 15–20% за 2–3 сделки',
+        });
+      }
+    } else if (weight >= 20 && p.sector !== 'ОФЗ') {
       signals.push({
-        positionId: p.id, ticker: p.ticker, level: 'critical',
-        title: 'Концентрационный риск',
-        detail: `Одна позиция — ${weight.toFixed(1)}% портфеля. Просадка актива на 20% потянет весь портфель на ${(weight * 0.2).toFixed(1)}%.`,
-        action: 'Снизить долю до 15–20% за 2–3 сделки',
+        positionId: p.id, ticker: p.ticker, level: 'warning',
+        title: 'Повышенная доля одного эмитента',
+        detail: `Корпоративная позиция — ${weight.toFixed(1)}% портфеля. Проблемы эмитента ударят заметно.`,
+        action: 'При пополнении брать бумаги других эмитентов',
       });
     }
+
     for (const flag of p.fundamentalFlags) {
       signals.push({
         positionId: p.id, ticker: p.ticker, level: 'warning',
@@ -137,7 +185,7 @@ export function buildRiskSignals(positions: Position[]): RiskSignal[] {
         action: 'Пересмотреть тезис инвестиции, установить стоп-уровень',
       });
     }
-    if (pct <= -12 && pct > -25 && month > -8) {
+    if (priceRiskMatters && pct <= -12 && pct > -25 && month > -8) {
       signals.push({
         positionId: p.id, ticker: p.ticker, level: 'warning',
         title: 'Длительная просадка',
