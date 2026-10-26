@@ -31,13 +31,16 @@ export default function PortfolioSection({ positions, selectedIds, onToggle, onT
 
   const t = useMemo(() => totals(selected), [selected]);
 
-  // Группы по знаку результата: П/У > 0 — доходные, < 0 — убыточные, = 0 — средние
+  // Группы по знаку результата: П/У > 0 — доходные, < 0 — убыточные, ≈0 — средние.
+  // Погрешность: меньше 1 ₽ или 0,02% от стоимости позиции считаем нулём
+  // (иначе разница в копейках из-за округления цены записывает бумагу «в минус»).
   const groups = useMemo(() => {
     const g: Record<GroupKey, Position[]> = { profit: [], neutral: [], loss: [] };
     for (const p of selected) {
       const gain = pnl(p);
-      if (gain > 0) g.profit.push(p);
-      else if (gain < 0) g.loss.push(p);
+      const eps = Math.max(1, marketValue(p) * 0.0002);
+      if (gain > eps) g.profit.push(p);
+      else if (gain < -eps) g.loss.push(p);
       else g.neutral.push(p);
     }
     const byPnl = (a: Position, b: Position) => pnl(b) - pnl(a);
@@ -210,7 +213,7 @@ export default function PortfolioSection({ positions, selectedIds, onToggle, onT
         </div>
         <p className="text-xs text-muted-foreground">
           Выбрано: {selected.length} из {positions.length} · Группы по знаку П/У: в плюс — доходные,
-          в минус — убыточные, ровно 0 — средние · Вложено {fmtMoney(t.invested)} ·
+          в минус — убыточные, около нуля (±копейки от округления цены) — средние · Вложено {fmtMoney(t.invested)} ·
           Стоимость {fmtMoney(t.value)} · П/У{' '}
           <span className={t.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
             {t.pnl >= 0 ? '+' : ''}{fmtMoney(t.pnl)} ({fmtPct(t.pnlPct)})
