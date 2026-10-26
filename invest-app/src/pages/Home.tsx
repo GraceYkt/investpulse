@@ -326,7 +326,7 @@ export default function Home() {
           <div>
             <h1 className="text-base font-bold leading-tight">ИнвестПульс</h1>
             <p className="text-[11px] leading-tight text-muted-foreground">
-              портфель Т-Банк · актуально на 23.10.2026
+              портфель Т-Банк · актуально на {DATA_AS_OF}
             </p>
           </div>
           <Badge variant="outline" className="ml-1 hidden border-emerald-500/40 bg-emerald-500/10 text-emerald-300 lg:inline-flex">
@@ -429,11 +429,10 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-7xl space-y-4 px-4 pt-4">
-        <RiskSignals signals={signals} />
-
         <OverviewCards t={t} positions={selected} />
 
         <TabsContent value="portfolio">
+          <RiskSignals signals={signals} />
           <div className="mb-4">
             <PortfolioChart history={history} investedBaseline={t.invested} />
           </div>

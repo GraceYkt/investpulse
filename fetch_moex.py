@@ -8,6 +8,7 @@ import os
 import ssl
 import time
 import urllib.request
+import datetime
 
 CTX = ssl._create_unverified_context()
 
@@ -25,7 +26,9 @@ if os.path.isfile(_meta_path):
 else:
     SECURITIES = DEFAULT_SECURITIES
 
-FROM, TILL = "2025-10-21", "2026-10-21"
+# динамический диапазон: год истории до сегодня (последний торговый день)
+_today = datetime.date.today()
+FROM, TILL = (_today - datetime.timedelta(days=400)).isoformat(), _today.isoformat()
 
 
 def get_json(url):
@@ -93,3 +96,30 @@ for sec in SECURITIES:
 with open("invest-app/src/data/moex-history.json", "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False)
 print("saved -> invest-app/src/data/moex-history.json")
+
+# DATA_AS_OF = дата последних реальных данных MOEX (банк может быть недоступен,
+# а котировки MOEX — нет; лейбл «котировки MOEX на …» должен быть честным)
+last_dates = [s["history"][-1]["date"] for s in out.values() if s["history"]]
+if last_dates:
+    moex_asof = max(last_dates)
+    portfolio_ts = os.path.join("invest-app", "src", "data", "portfolio.ts")
+    with open(portfolio_ts, encoding="utf-8") as f:
+        src = f.read()
+    import re as _re
+    def _parse(d):
+        try:
+            return datetime.date.fromisoformat(d)
+        except ValueError:
+            return None
+    m = _re.search(r"DATA_AS_OF = '(\d{2})\.(\d{2})\.(\d{4})'", src)
+    cur = datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1))) if m else None
+    if _parse(moex_asof) and (cur is None or _parse(moex_asof) > cur):
+        ru = f"{moex_asof[8:10]}.{moex_asof[5:7]}.{moex_asof[0:4]}"
+        src = _re.sub(
+            r"DATA_AS_OF = '[^']+';[^\n]*",
+            f"DATA_AS_OF = '{ru}'; // дата последних котировок (MOEX + приложение Т-Банк)",
+            src,
+        )
+        with open(portfolio_ts, "w", encoding="utf-8") as f:
+            f.write(src)
+        print(f"DATA_AS_OF обновлён -> {ru}")
