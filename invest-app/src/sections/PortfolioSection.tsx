@@ -7,6 +7,20 @@ import {
   cagr, fmtDate, fmtMoney, fmtNum, fmtPct, invested, marketValue, pnl, pnlPct, totals,
 } from '@/lib/portfolio';
 import RecommendationsSection from '@/sections/RecommendationsSection';
+import moex from '@/data/moex-history.json';
+import { KEY_RATE } from '@/data/market';
+
+const MOEX = moex as Record<string, { yieldclose: number | null }>;
+
+/** Доходность к погашению, % годовых: реальная с MOEX, иначе оценка из параметров позиции. */
+function ytmOf(p: Position): number {
+  const y = MOEX[p.id]?.yieldclose;
+  if (y != null && y > 0) return y;
+  if (!p.durationDays || p.currentPrice <= 0) return 0;
+  const years = p.durationDays / 365;
+  const couponPerYear = p.couponPercent ? (p.couponPercent / 100) * 1000 : 0;
+  return (((1000 - p.currentPrice) / years + couponPerYear) / p.currentPrice) * 100;
+}
 
 interface Props {
   positions: Position[];
@@ -31,17 +45,17 @@ export default function PortfolioSection({ positions, selectedIds, onToggle, onT
 
   const t = useMemo(() => totals(selected), [selected]);
 
-  // Группы по знаку результата: П/У > 0 — доходные, < 0 — убыточные, ≈0 — средние.
-  // Погрешность: меньше 1 ₽ или 0,02% от стоимости позиции считаем нулём
-  // (иначе разница в копейках из-за округления цены записывает бумагу «в минус»).
+  // Группы по доходности к погашению (стратегия «держим все до погашения»):
+  // YTM >= ставка ЦБ — доходные; 0…ставка — средние (прибыль ниже бесплатной);
+  // < 0 — убыточные (к погашению реальная потеря).
   const groups = useMemo(() => {
     const g: Record<GroupKey, Position[]> = { profit: [], neutral: [], loss: [] };
+    const rate = KEY_RATE.value;
     for (const p of selected) {
-      const gain = pnl(p);
-      const eps = Math.max(1, marketValue(p) * 0.0002);
-      if (gain > eps) g.profit.push(p);
-      else if (gain < -eps) g.loss.push(p);
-      else g.neutral.push(p);
+      const ytm = ytmOf(p);
+      if (ytm >= rate) g.profit.push(p);
+      else if (ytm > 0) g.neutral.push(p);
+      else g.loss.push(p);
     }
     const byPnl = (a: Position, b: Position) => pnl(b) - pnl(a);
     g.profit.sort(byPnl);
@@ -212,8 +226,9 @@ export default function PortfolioSection({ positions, selectedIds, onToggle, onT
           </div>
         </div>
         <p className="text-xs text-muted-foreground">
-          Выбрано: {selected.length} из {positions.length} · Группы по знаку П/У: в плюс — доходные,
-          в минус — убыточные, около нуля (±копейки от округления цены) — средние · Вложено {fmtMoney(t.invested)} ·
+          Выбрано: {selected.length} из {positions.length} · Группы по доходности к погашению (стратегия «держим до
+          погашения»): ≥ ставки ЦБ — доходные, 0…{KEY_RATE.value.toFixed(0)}% — средние, &lt; 0 — убыточные ·
+          Вложено {fmtMoney(t.invested)} ·
           Стоимость {fmtMoney(t.value)} · П/У{' '}
           <span className={t.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}>
             {t.pnl >= 0 ? '+' : ''}{fmtMoney(t.pnl)} ({fmtPct(t.pnlPct)})
