@@ -35,6 +35,11 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
     value > 0
       ? positions.reduce((s, p) => s + ytmOf(p) * marketValue(p), 0) / value
       : 0;
+  // Прогноз капитала к средней дате погашения: сложный процент по YTM
+  const years = duration / 365;
+  const forecastValue = value > 0 && ytm > 0 ? value * Math.pow(1 + ytm / 100, years) : 0;
+  const forecastDate = new Date(Date.now() + duration * 24 * 3600 * 1000)
+    .toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -49,7 +54,7 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
       <Card
         label="Сложный процент (CAGR)"
         value={fmtPct(t.cagr)}
-        sub="годовая доходность"
+        sub={`годовая доходность · к ${forecastDate}: ≈ ${fmtMoney(forecastValue)} (+${fmtMoney(forecastValue - value)})`}
         tone={t.cagr > 0 ? 'up' : t.cagr < 0 ? 'down' : 'flat'}
       />
       <Card
