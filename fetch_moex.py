@@ -65,6 +65,31 @@ def pick(row, *keys):
     return None
 
 
+def fetch_live_full_price(secid):
+    """Полная цена (чистая + НКД) текущей торговой сессии, или None.
+    Перебираем доски: ОФЗ — TQOB, корпоративные — TQCB и др."""
+    for board in ("TQOB", "TQCB", "TQIR", None):
+        url = (
+            "https://iss.moex.com/iss/engines/stock/markets/bonds"
+            + (f"/boards/{board}" if board else "")
+            + f"/securities/{secid}.json?iss.meta=off"
+        )
+        try:
+            data = get_json(url)
+            cols = data["marketdata"]["columns"]
+            for row in data["marketdata"]["data"]:
+                r = dict(zip(cols, row))
+                price = pick(r, "MARKETPRICE", "LAST", "LCURRENTPRICE")
+                if price is None:
+                    continue
+                return round(float(price) * 10 + float(r.get("ACCINT") or 0), 2)
+        except Exception:
+            continue
+    return None
+
+
+today_iso = _today.isoformat()
+
 out = {}
 for sec in SECURITIES:
     rows = fetch_history(sec)
@@ -80,6 +105,12 @@ for sec in SECURITIES:
         full_rub = round(float(price) * 10 + accint, 2)
         series.append({"date": r["TRADEDATE"], "price": full_rub})
         last_meta = r
+    # История MOEX содержит только закрытые сессии — в торговый день
+    # подхватываем текущую сессию, чтобы данные не «старели» на день.
+    if series and series[-1]["date"] < today_iso:
+        live = fetch_live_full_price(sec)
+        if live is not None:
+            series.append({"date": today_iso, "price": live})
     out[sec] = {
         "shortname": last_meta.get("SHORTNAME") or sec,
         "matdate": last_meta.get("MATDATE"),

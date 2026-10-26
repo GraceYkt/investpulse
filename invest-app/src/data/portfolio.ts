@@ -76,4 +76,4 @@ export const POSITIONS: Position[] = HOLDINGS.map(([secid, name, sector, qty, bu
   };
 });
 
-export const DATA_AS_OF = '23.10.2026'; // дата последних котировок (MOEX + приложение Т-Банк)
+export const DATA_AS_OF = '26.10.2026'; // дата последних котировок (MOEX + приложение Т-Банк)

@@ -1,5 +1,5 @@
 import type { Position } from '@/types/portfolio';
-import { fmtMoney, fmtPct, marketValue, type PortfolioTotals } from '@/lib/portfolio';
+import { fmtMoney, fmtPct, marketValue, ytmOf, type PortfolioTotals } from '@/lib/portfolio';
 
 function Card(props: {
   label: string;
@@ -30,6 +30,11 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
     value > 0
       ? positions.reduce((s, p) => s + (p.durationDays ?? 0) * marketValue(p), 0) / value
       : 0;
+  // Ожидаемая доходность до погашения (YTM), взвешенная по стоимости
+  const ytm =
+    value > 0
+      ? positions.reduce((s, p) => s + ytmOf(p) * marketValue(p), 0) / value
+      : 0;
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
@@ -38,7 +43,7 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
       <Card
         label="Прибыль / убыток"
         value={`${t.pnl >= 0 ? '+' : ''}${fmtMoney(t.pnl)}`}
-        sub={fmtPct(t.pnlPct) + ' за период владения'}
+        sub={`${fmtPct(t.pnlPct)} за период · YTM до погашения ≈ ${fmtPct(ytm)} годовых`}
         tone={t.pnl > 0 ? 'up' : t.pnl < 0 ? 'down' : 'flat'}
       />
       <Card
