@@ -363,6 +363,7 @@ export default function Home() {
               className="gap-1.5"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="sm:hidden">{refreshing ? '…' : 'Обновить'}</span>
               <span className="hidden sm:inline">{refreshing ? 'Обновление…' : 'Обновить котировки'}</span>
             </Button>
             <Button
