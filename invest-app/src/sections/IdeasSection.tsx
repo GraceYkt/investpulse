@@ -241,6 +241,10 @@ export default function IdeasSection() {
 
   useEffect(() => {
     refreshMarket();
+    // кнопка «Обновить котировки» в шапке и автоповтор каждые 10 минут
+    const handler = () => void refreshMarket();
+    window.addEventListener('investpulse:refresh', handler);
+    return () => window.removeEventListener('investpulse:refresh', handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

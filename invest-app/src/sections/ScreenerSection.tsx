@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ShieldCheck, Wind, Percent, Coins, ChevronDown, ExternalLink } from 'lucide-react';
 import screener from '@/data/screener.json';
+import { fetchSnapshots, type BondSnapshot } from '@/lib/securityAnalysis';
 
 type Item = {
   secid: string;
@@ -134,6 +135,49 @@ function ItemCard({ it, rank }: { it: Item; rank: number }) {
 }
 
 export default function ScreenerSection() {
+  // Живые снимки MOEX поверх расчётных данных сборки: доходность, дюрация, купон
+  const [snaps, setSnaps] = useState<Map<string, BondSnapshot>>(new Map());
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+
+  const bondSecids = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          [...D.groups.reliable, ...D.groups.rateFree, ...D.groups.yieldAbove].map((i) => i.secid),
+        ),
+      ),
+    [],
+  );
+
+  const refresh = async () => {
+    const m = await fetchSnapshots(bondSecids);
+    setSnaps(m);
+    setUpdatedAt(new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
+  };
+
+  useEffect(() => {
+    void refresh();
+    // кнопка «Обновить котировки» в шапке и автоповтор каждые 10 минут
+    const handler = () => void refresh();
+    window.addEventListener('investpulse:refresh', handler);
+    return () => window.removeEventListener('investpulse:refresh', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const merge = (it: Item): Item => {
+    const s = it.kind === 'share' ? undefined : snaps.get(it.secid);
+    if (!s) return it;
+    return {
+      ...it,
+      scores: {
+        ...it.scores,
+        yieldPct: s.ytm,
+        durationYears: Math.round((s.durationDays / 365) * 100) / 100,
+        couponPct: s.couponPercent ?? it.scores.couponPct,
+      },
+    };
+  };
+
   return (
     <div className="space-y-4">
       {/* Методика */}
@@ -144,6 +188,7 @@ export default function ScreenerSection() {
         <p className="mt-1 text-xs text-muted-foreground">
           Бумаги ранжируются по пяти критериям, а не по одной ключевой ставке. Данные MOEX и
           Smart-Lab · сформировано {D.generatedAt} · ставка ЦБ {D.keyRate.toFixed(0)}%
+          {updatedAt && <> · <span className="text-emerald-400">живые котировки {updatedAt}</span></>}
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
           {CRITERIA.map((c) => (
@@ -185,7 +230,7 @@ export default function ScreenerSection() {
               ) : (
                 <div className="space-y-1.5">
                   {items.map((it, i) => (
-                    <ItemCard key={it.secid} it={it} rank={i + 1} />
+                    <ItemCard key={it.secid} it={merge(it)} rank={i + 1} />
                   ))}
                 </div>
               )}
