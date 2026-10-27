@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Activity, PieChart, Lightbulb, Radio, RefreshCw, BarChart3, CloudDownload, KeyRound, Search } from 'lucide-react';
-import { DATA_AS_OF, POSITIONS } from '@/data/portfolio';
+import { DATA_AS_OF, POSITIONS, POSITIONS_IIS, ACCOUNTS_META } from '@/data/portfolio';
 import { buildPortfolioSignals, buildRiskSignals, portfolioHistory, totals } from '@/lib/portfolio';
 import {
   fetchBrokerPortfolio, getBrokerToken, saveBrokerToken, type BrokerHolding,
@@ -46,10 +46,28 @@ async function fetchLatestQuote(secid: string): Promise<QuoteUpdate | null> {
   return { id: secid, date: String(r.TRADEDATE), price: +(clean * 10 + accint).toFixed(2) };
 }
 
+type AccountKey = 'broker' | 'iis';
+
+const HAS_IIS = POSITIONS_IIS.length > 0;
+
+function initialAccount(): AccountKey {
+  if (!HAS_IIS) return 'broker';
+  try {
+    return localStorage.getItem('investpulse:account') === 'iis' ? 'iis' : 'broker';
+  } catch {
+    return 'broker';
+  }
+}
+
+function accountPositions(key: AccountKey): Position[] {
+  return key === 'iis' && HAS_IIS ? POSITIONS_IIS : POSITIONS;
+}
+
 export default function Home() {
-  const [positions, setPositions] = useState<Position[]>(POSITIONS);
+  const [account, setAccount] = useState<AccountKey>(initialAccount);
+  const [positions, setPositions] = useState<Position[]>(() => accountPositions(initialAccount()));
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    () => new Set(POSITIONS.map((p) => p.id)),
+    () => new Set(accountPositions(initialAccount()).map((p) => p.id)),
   );
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
@@ -63,6 +81,22 @@ export default function Home() {
   const [ghDialogOpen, setGhDialogOpen] = useState(false);
   const [ghDraft, setGhDraft] = useState('');
   const autoSyncRan = useRef(false);
+
+  // Переключение счёта: пересобираем позиции, выбор и показатели
+  const switchAccount = (key: AccountKey) => {
+    setAccount(key);
+    try {
+      localStorage.setItem('investpulse:account', key);
+    } catch {
+      /* приватный режим — просто не запоминаем */
+    }
+    const next = accountPositions(key);
+    setPositions(next);
+    setSelectedIds(new Set(next.map((p) => p.id)));
+    setLastRefresh(null);
+  };
+  const accountLabel =
+    account === 'iis' ? (ACCOUNTS_META.iis ?? 'ИИС') : (ACCOUNTS_META.broker ?? 'брокерский');
 
   // Облачная синхрониза: диспатчим workflow и ждём завершения, затем перезагрузка
   const cloudSync = async () => {
@@ -328,9 +362,26 @@ export default function Home() {
           <div>
             <h1 className="text-base font-bold leading-tight">ИнвестПульс</h1>
             <p className="text-[11px] leading-tight text-muted-foreground">
-              портфель Т-Банк · актуально на {DATA_AS_OF}
+              портфель Т-Банк · {accountLabel} · актуально на {DATA_AS_OF}
             </p>
           </div>
+          {HAS_IIS && (
+            <div className="flex overflow-hidden rounded-lg border border-border/60 text-[11px]">
+              {(['broker', 'iis'] as AccountKey[]).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => switchAccount(k)}
+                  className={`px-2.5 py-1 transition-colors ${
+                    account === k
+                      ? 'bg-indigo-500/20 font-semibold text-indigo-200'
+                      : 'text-muted-foreground hover:bg-muted/30'
+                  }`}
+                >
+                  {k === 'broker' ? 'Брокерский' : 'ИИС'}
+                </button>
+              ))}
+            </div>
+          )}
           <Badge variant="outline" className="ml-1 hidden border-emerald-500/40 bg-emerald-500/10 text-emerald-300 lg:inline-flex">
             Реальный портфель · котировки MOEX на {DATA_AS_OF}
           </Badge>

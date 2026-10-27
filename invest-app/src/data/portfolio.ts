@@ -3,10 +3,10 @@ import moex from '@/data/moex-history.json';
 import coupons from '@/data/coupons.json';
 
 /**
- * Реальный портфель Т-Банк. Состав и средние цены — по приложению банка
- * на 23.10.2026 (пока API банка недоступен, обновляется вручную со скриншотов;
- * П/У совпадает с «за все время» в Т-Банке).
- * История цен — MOEX ISS (полная цена: чистая + НКД), точка 23.10.2026 из приложения банка.
+ * Портфели синхронизированы с Т-Инвестиции API (read-only).
+ * Брокерский: актуально на 23.10.2026 (пока шлюз банка «мигает», обновляется вручную;
+ * ИИС открыт 12.10.2026, позиции подтянутся при следующей успешной синхронизации).
+ * История цен — MOEX ISS (полная цена с НКД).
  */
 
 interface MoexEntry {
@@ -21,11 +21,61 @@ interface MoexEntry {
 
 const MOEX = moex as Record<string, MoexEntry>;
 
-const BUY_DATE = '2026-10-12';
+interface CouponInfo {
+  nextDate: string;
+  nextValueRub: number;
+  perYear: number;
+}
 
-// ticker (secid MOEX) → [отображаемое имя, сектор, количество, цена покупки (полная, с НКД), флаги]
-// Цена покупки такова, что qty × (текущая − покупки) = П/У «за все время» из Т-Банка.
-const HOLDINGS: [string, string, string, number, number, string[]][] = [
+const COUPONS = coupons as Record<string, CouponInfo | null>;
+
+// holdings: [secid, отображаемое имя, сектор, количество, цена покупки с НКД, флаги]
+function buildPositions(
+  holdings: [string, string, string, number, number, string[]][],
+  buyDate: string,
+): Position[] {
+  return holdings.map(([secid, name, sector, qty, buyPrice, flags]) => {
+    const m = MOEX[secid];
+    const c = COUPONS[secid];
+    if (!m) {
+      return {
+        id: secid,
+        ticker: name,
+        name,
+        type: 'bond' as const,
+        sector,
+        quantity: qty,
+        avgBuyPrice: buyPrice,
+        currentPrice: buyPrice,
+        buyDate,
+        fundamentalFlags: flags,
+        history: [{ date: buyDate, price: buyPrice }],
+      };
+    }
+    const last = m.history[m.history.length - 1];
+    return {
+      id: secid,
+      ticker: name,
+      name: m.shortname,
+      type: 'bond' as const,
+      sector,
+      quantity: qty,
+      avgBuyPrice: buyPrice,
+      currentPrice: last.price,
+      buyDate,
+      matdate: m.matdate ?? undefined,
+      couponPercent: m.couponpercent ?? undefined,
+      durationDays: m.duration != null ? Math.round(m.duration) : undefined,
+      nextCouponDate: c?.nextDate,
+      nextCouponValue: c?.nextValueRub,
+      couponsPerYear: c?.perYear,
+      fundamentalFlags: flags,
+      history: m.history,
+    };
+  });
+}
+
+const HOLDINGS_BROKER: [string, string, string, number, number, string[]][] = [
   ['SU26228RMFS5', 'ОФЗ 26228', 'ОФЗ', 1, 812.33, []],
   ['SU26232RMFS7', 'ОФЗ 26232', 'ОФЗ', 1, 942.69, []],
   ['SU26235RMFS0', 'ОФЗ 26235', 'ОФЗ', 1, 717.41, []],
@@ -42,38 +92,15 @@ const HOLDINGS: [string, string, string, number, number, string[]][] = [
   ]],
   ['RU000A10EJQ7', 'Атомэнергопром 001Р-11', 'Корпоративные', 1, 994.92, []],
 ];
+const BUY_DATE_BROKER = '2026-10-12';
 
-interface CouponInfo {
-  nextDate: string;
-  nextValueRub: number;
-  perYear: number;
-}
+export const POSITIONS: Position[] = buildPositions(HOLDINGS_BROKER, BUY_DATE_BROKER);
+export const POSITIONS_IIS: Position[] = [];
 
-const COUPONS = coupons as Record<string, CouponInfo | null>;
-
-export const POSITIONS: Position[] = HOLDINGS.map(([secid, name, sector, qty, buyPrice, flags]) => {
-  const m = MOEX[secid];
-  const c = COUPONS[secid];
-  const last = m.history[m.history.length - 1];
-  return {
-    id: secid,
-    ticker: name,
-    name: m.shortname,
-    type: 'bond' as const,
-    sector,
-    quantity: qty,
-    avgBuyPrice: buyPrice,
-    currentPrice: last.price,
-    buyDate: BUY_DATE,
-    matdate: m.matdate ?? undefined,
-    couponPercent: m.couponpercent ?? undefined,
-    durationDays: m.duration != null ? Math.round(m.duration) : undefined,
-    nextCouponDate: c?.nextDate,
-    nextCouponValue: c?.nextValueRub,
-    couponsPerYear: c?.perYear,
-    fundamentalFlags: flags,
-    history: m.history,
-  };
-});
+export const ACCOUNTS_META = {
+  asOf: '26.10.2026',
+  broker: 'Брокерский счёт 1',
+  iis: 'ИИС',
+};
 
 export const DATA_AS_OF = '26.10.2026'; // дата последних котировок (MOEX + приложение Т-Банк)

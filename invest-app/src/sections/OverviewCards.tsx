@@ -1,5 +1,5 @@
 import type { Position } from '@/types/portfolio';
-import { fmtMoney, fmtPct, marketValue, ytmOf, type PortfolioTotals } from '@/lib/portfolio';
+import { fmtDate, fmtMoney, fmtPct, marketValue, ytmOf, type PortfolioTotals } from '@/lib/portfolio';
 
 function Card(props: {
   label: string;
@@ -35,6 +35,10 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
     value > 0
       ? positions.reduce((s, p) => s + ytmOf(p) * marketValue(p), 0) / value
       : 0;
+  // Дата самой ранней покупки (для подписи «Вложено»)
+  const firstBuy = positions.length
+    ? positions.reduce((m, p) => (p.buyDate < m ? p.buyDate : m), positions[0].buyDate)
+    : '';
   // Прогноз капитала к средней дате погашения: сложный процент по YTM
   const years = duration / 365;
   const forecastValue = value > 0 && ytm > 0 ? value * Math.pow(1 + ytm / 100, years) : 0;
@@ -44,7 +48,7 @@ export default function OverviewCards({ t, positions }: { t: PortfolioTotals; po
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
       <Card label="Стоимость портфеля" value={fmtMoney(t.value)} sub={`${positions.length} позиций`} />
-      <Card label="Вложено" value={fmtMoney(t.invested)} sub="сумма покупок 12.10.2026" />
+      <Card label="Вложено" value={fmtMoney(t.invested)} sub={firstBuy ? `сумма покупок ${fmtDate(firstBuy)}` : 'сумма покупок'} />
       <Card
         label="Прибыль / убыток"
         value={`${t.pnl >= 0 ? '+' : ''}${fmtMoney(t.pnl)}`}
