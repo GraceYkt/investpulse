@@ -266,7 +266,7 @@ export default function IdeasSection() {
           <div className="min-w-60">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
               <CalendarClock className="h-3.5 w-3.5" />
-              Заседание ЦБ — {KEY_RATE.nextMeeting} (завтра)
+              Заседание ЦБ — {KEY_RATE.nextMeeting}
             </div>
             <div className="mt-1 text-xs text-muted-foreground">{KEY_RATE.consensus}</div>
           </div>
