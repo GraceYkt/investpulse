@@ -158,6 +158,64 @@ export async function fetchSnapshots(secids: string[]): Promise<Map<string, Bond
   return out;
 }
 
+export interface LiquidEntry {
+  secid: string;
+  isin: string | null;
+  name: string;
+  kind: 'bond' | 'share';
+  board: string;
+  price: number | null; // % от номинала (облигации) или ₽ (акции)
+  ytm: number | null; // облигации, %
+  valueMn: number; // оборот сегодня, млн ₽
+  trades: number; // сделок сегодня
+}
+
+const LIQ_BOARDS: { board: string; kind: 'bond' | 'share' }[] = [
+  { board: 'TQOB', kind: 'bond' }, // ОФЗ
+  { board: 'TQCB', kind: 'bond' }, // корпоративные
+  { board: 'TQBR', kind: 'share' }, // акции
+];
+
+/** ТОП самых ликвидных бумаг MOEX прямо сейчас: ранжирование по обороту дня. */
+export async function fetchLiquidTop(n = 10): Promise<LiquidEntry[]> {
+  const all: LiquidEntry[] = [];
+  await Promise.all(
+    LIQ_BOARDS.map(async ({ board, kind }) => {
+      const market = kind === 'bond' ? 'bonds' : 'shares';
+      let start = 0;
+      for (;;) {
+        const d = await getJson(
+          `${ISS}/engines/stock/markets/${market}/boards/${board}/securities.json` +
+            `?iss.meta=off&iss.only=securities,marketdata&start=${start}&limit=100`,
+        );
+        if (!d) return;
+        const secs = rowsOf(d.securities);
+        if (!secs.length) return;
+        const mdById = new Map(rowsOf(d.marketdata).map((r) => [String(r.SECID), r]));
+        for (const s of secs) {
+          const m = mdById.get(String(s.SECID)) ?? {};
+          const value = Number(m.VALUE ?? 0);
+          if (!value || value <= 0) continue;
+          all.push({
+            secid: String(s.SECID),
+            isin: (s.ISIN as string) ?? null,
+            name: (s.SHORTNAME as string) ?? String(s.SECID),
+            kind,
+            board,
+            price: Number(m.LAST ?? m.MARKETPRICE ?? m.MARKETPRICE3 ?? 0) || null,
+            ytm: kind === 'bond' ? Number(m.YIELD ?? 0) || null : null,
+            valueMn: Math.round((value / 1e6) * 10) / 10,
+            trades: Number(m.NUMTRADES ?? 0) || 0,
+          });
+        }
+        if (secs.length < 100) return;
+        start += 100;
+      }
+    }),
+  );
+  return all.sort((a, b) => b.valueMn - a.valueMn).slice(0, n);
+}
+
 /** Комментарий к риск-скорингу для подсказок и аналитики. */
 export function riskComment(snap: BondSnapshot): string {
   const parts: string[] = [];

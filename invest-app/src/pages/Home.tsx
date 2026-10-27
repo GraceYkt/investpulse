@@ -285,6 +285,8 @@ export default function Home() {
         }),
       );
       setLastRefresh(new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
+      // оповещаем Аналитику и другие live-блоки: перечитать данные с MOEX
+      window.dispatchEvent(new CustomEvent('investpulse:refresh'));
     } catch {
       setRefreshError(true);
     } finally {

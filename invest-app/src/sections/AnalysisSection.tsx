@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import analytics from '@/data/pick-analytics.json';
 import { fmtDate } from '@/lib/portfolio';
-import { fetchSnapshots, modDuration, type BondSnapshot } from '@/lib/securityAnalysis';
+import { fetchSnapshots, fetchLiquidTop, modDuration, type BondSnapshot, type LiquidEntry } from '@/lib/securityAnalysis';
 
 type Item = {
   key: string;
@@ -275,6 +275,7 @@ export default function AnalysisSection() {
   const [type, setType] = useState<string>('Все');
   const [open, setOpen] = useState<Item | null>(null);
   const [snaps, setSnaps] = useState<Map<string, BondSnapshot>>(new Map());
+  const [liquid, setLiquid] = useState<LiquidEntry[] | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
@@ -297,11 +298,22 @@ export default function AnalysisSection() {
   const refresh = async () => {
     setRefreshing(true);
     const secids = DATA.items.filter((i) => i.kind === 'bond' && i.secid).map((i) => i.secid!);
-    const m = await fetchSnapshots(secids);
+    const [m, liq] = await Promise.all([fetchSnapshots(secids), fetchLiquidTop(10)]);
     setSnaps(m);
+    setLiquid(liq);
     setUpdatedAt(new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
     setRefreshing(false);
   };
+
+  // При открытии страницы — сразу живой анализ; кнопка «Обновить котировки»
+  // в шапке и автоповтор каждые 10 минут шлют событие investpulse:refresh.
+  useEffect(() => {
+    void refresh();
+    const handler = () => void refresh();
+    window.addEventListener('investpulse:refresh', handler);
+    return () => window.removeEventListener('investpulse:refresh', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const types = useMemo(() => ['Все', ...Array.from(new Set(DATA.items.map((i) => i.assetType)))], []);
   const filtered = useMemo(() => {
@@ -458,6 +470,61 @@ export default function AnalysisSection() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ТОП ликвидности — живые обороты MOEX */}
+      <div className="panel overflow-hidden rounded-xl">
+        <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-4 py-2.5">
+          <span className="flex items-center gap-1.5 text-sm font-semibold">
+            <Activity className="h-4 w-4 text-indigo-300" /> ТОП-10 самых ликвидных бумаг MOEX
+          </span>
+          <span className="text-[11px] text-muted-foreground">
+            по обороту сегодня · живые данные{updatedAt && ` · обновлено ${updatedAt}`}
+          </span>
+        </div>
+        {liquid === null ? (
+          <div className="p-5 text-center text-xs text-muted-foreground">
+            Загружаю живые обороты с MOEX…
+          </div>
+        ) : (
+          <div className="grid gap-2 p-2 md:grid-cols-2">
+            {liquid.map((it, i) => (
+              <div
+                key={it.secid}
+                className="flex items-center justify-between gap-2 rounded-lg border border-border/50 p-2.5"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold tabular-nums">
+                      {i + 1}
+                    </span>
+                    <span className="truncate text-xs font-semibold">{it.name}</span>
+                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                      {it.kind === 'share' ? 'акция' : it.board === 'TQOB' ? 'ОФЗ' : 'корп.'}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 truncate text-[11px] tabular-nums text-muted-foreground">
+                    оборот {it.valueMn.toLocaleString('ru-RU')} млн ₽ · {it.trades.toLocaleString('ru-RU')} сделок
+                    {it.ytm != null && <> · доходность <span className="text-emerald-400">{it.ytm.toFixed(2).replace('.', ',')}%</span></>}
+                  </p>
+                </div>
+                <a
+                  href={
+                    it.kind === 'bond' && it.isin
+                      ? `https://www.tbank.ru/invest/bonds/${it.isin}/`
+                      : `https://www.tbank.ru/invest/stocks/${it.secid}/`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-[11px]">
+                    <ShoppingCart className="h-3 w-3" /> Купить
+                  </Button>
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Два блока: зависимые vs независимые от ставки */}
