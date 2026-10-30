@@ -42,10 +42,19 @@ jobs:
         run: python sync_broker.py || echo 'синхронизация с брокером не удалась — продолжаем с текущими данными'
 
       - name: Обновление котировок MOEX
-        run: python fetch_moex.py
+        # MOEX иногда рвёт соединение — до 3 попыток с паузой
+        run: |
+          for i in 1 2 3; do
+            python fetch_moex.py && break
+            echo "попытка $i не удалась, жду 30 с..."; sleep 30
+          done
 
       - name: Обновление купонов
-        run: python fetch_coupons.py
+        run: |
+          for i in 1 2 3; do
+            python fetch_coupons.py && break
+            echo "попытка $i не удалась, жду 30 с..."; sleep 30
+          done
 
       - name: Подборка топ-10 и аналитика
         run: |
