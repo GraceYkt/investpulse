@@ -80,7 +80,18 @@ export default function Home() {
   const [tokenDraft, setTokenDraft] = useState('');
   const [ghDialogOpen, setGhDialogOpen] = useState(false);
   const [ghDraft, setGhDraft] = useState('');
+  const [syncedAt, setSyncedAt] = useState<string | null>(null);
   const autoSyncRan = useRef(false);
+
+  // Метка последней успешной синхронизации в облаке (пишет workflow в sync-meta.json)
+  useEffect(() => {
+    fetch(`sync-meta.json?v=${Date.now()}`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.syncedAt) setSyncedAt(String(d.syncedAt));
+      })
+      .catch(() => {});
+  }, []);
 
   // Переключение счёта: пересобираем позиции, выбор и показатели
   const switchAccount = (key: AccountKey) => {
@@ -97,6 +108,24 @@ export default function Home() {
   };
   const accountLabel =
     account === 'iis' ? (ACCOUNTS_META.iis ?? 'ИИС') : (ACCOUNTS_META.broker ?? 'брокерский');
+
+  // Свежесть данных: <3 ч — зелёный, <36 ч — жёлтый, старше — красный
+  const syncInfo = useMemo(() => {
+    if (!syncedAt) return null;
+    const dt = new Date(syncedAt);
+    if (isNaN(dt.getTime())) return null;
+    const ageMin = (Date.now() - dt.getTime()) / 60000;
+    const label = dt.toLocaleString('ru-RU', {
+      timeZone: 'Europe/Moscow',
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    if (ageMin < 180) return { label, text: 'данные свежие', dot: 'bg-emerald-400', textCls: 'text-emerald-400' };
+    if (ageMin < 2160) return { label, text: 'данные за сутки', dot: 'bg-amber-400', textCls: 'text-amber-300' };
+    return { label, text: 'данные устарели — нажмите «Синхронизировать API»', dot: 'bg-red-400', textCls: 'text-red-400' };
+  }, [syncedAt]);
 
   // Облачная синхрониза: диспатчим workflow и ждём завершения, затем перезагрузка
   const cloudSync = async () => {
@@ -456,8 +485,19 @@ export default function Home() {
             <div className="hidden items-center gap-2 text-xs text-muted-foreground xl:flex">
               <Radio className="h-3.5 w-3.5 text-emerald-400" />
               Ключевая ставка ЦБ: <span className="font-semibold text-foreground">14,00%</span>
-              · заседание 23.10
+              · заседание 18.12
             </div>
+            {syncInfo && (
+              <div
+                className="hidden items-center gap-2 text-xs xl:flex"
+                title="Время последней успешной синхронизации портфеля и котировок в облаке GitHub (мск)"
+              >
+                <span className={`h-2 w-2 animate-pulse rounded-full ${syncInfo.dot}`} />
+                <span className="text-muted-foreground">Синхронизация:</span>
+                <span className="font-semibold tabular-nums text-foreground">{syncInfo.label}</span>
+                <span className={syncInfo.textCls}>· {syncInfo.text}</span>
+              </div>
+            )}
           </div>
           {(lastRefresh || refreshError) && (
             <div className="w-full text-right text-[11px] text-muted-foreground">

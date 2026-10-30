@@ -42,19 +42,29 @@ jobs:
         run: python sync_broker.py || echo 'синхронизация с брокером не удалась — продолжаем с текущими данными'
 
       - name: Обновление котировок MOEX
-        # MOEX иногда рвёт соединение — до 3 попыток с паузой
+        # MOEX иногда рвёт соединение — до 3 попыток с паузой;
+        # если все 3 не удались — шаг падает, деплой не происходит (на сайте остаются прошлые данные)
         run: |
+          ok=0
           for i in 1 2 3; do
-            python fetch_moex.py && break
+            python fetch_moex.py && { ok=1; break; }
             echo "попытка $i не удалась, жду 30 с..."; sleep 30
           done
+          [ "$ok" = 1 ]
 
       - name: Обновление купонов
         run: |
+          ok=0
           for i in 1 2 3; do
-            python fetch_coupons.py && break
+            python fetch_coupons.py && { ok=1; break; }
             echo "попытка $i не удалась, жду 30 с..."; sleep 30
           done
+          [ "$ok" = 1 ]
+
+      - name: Метка времени последней синхронизации
+        # выполняется только если все данные успешно обновлены — пишем в public,
+        # оттуда файл попадает в сборку и шапка сайта показывает свежесть данных
+        run: printf '{"syncedAt":"%s"}' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > invest-app/public/sync-meta.json
 
       - name: Подборка топ-10 и аналитика
         run: |
