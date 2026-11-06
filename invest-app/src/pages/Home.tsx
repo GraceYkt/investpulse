@@ -10,6 +10,7 @@ import { buildPortfolioSignals, buildRiskSignals, portfolioHistory, totals } fro
 import {
   fetchBrokerPortfolio, getBrokerToken, saveBrokerToken, type BrokerHolding,
   isCloudHost, getGhToken, saveGhToken, dispatchCloudSync, cloudRunStatus,
+  newestActiveRun, type CloudRunState,
 } from '@/lib/brokerSync';
 import type { Position } from '@/types/portfolio';
 import OverviewCards from '@/sections/OverviewCards';
@@ -147,16 +148,29 @@ export default function Home() {
     }
     const started = Date.now();
     const poll = async (): Promise<void> => {
-      let st: 'running' | 'success' | 'failure';
+      let st: CloudRunState;
       try {
         st = await cloudRunStatus(gh, runId);
       } catch {
         st = 'running'; // временные сбои API — просто ждём дальше
       }
+      if (st === 'cancelled') {
+        // наш запуск отменили, поставив в очередь более новый — переключаемся на него
+        const next = await newestActiveRun(gh).catch(() => null);
+        if (next && next !== runId) {
+          runId = next;
+          setSyncMsg('Предыдущий запуск был заменён новым — продолжаю следить за синхронизацией…');
+          await new Promise((r) => setTimeout(r, 8000));
+          return poll();
+        }
+        setSyncState('error');
+        setSyncMsg('Запуск синхронизации был отменён и активных не осталось. Попробуйте ещё раз.');
+        return;
+      }
       if (st === 'running') {
-        if (Date.now() - started > 12 * 60 * 1000) {
+        if (Date.now() - started > 20 * 60 * 1000) {
           setSyncState('error');
-          setSyncMsg('Синхронизация в облаке идёт дольше 12 минут. Проверьте статус позже — страница сама обновится, когда GitHub опубликует данные.');
+          setSyncMsg('Синхронизация в облаке идёт дольше 20 минут (возможна очередь из запусков). Проверьте статус позже — страница сама обновится, когда GitHub опубликует данные.');
           return;
         }
         setSyncMsg('Синхронизация в облаке выполняется: банк → MOEX → купоны → сборка → публикация…');

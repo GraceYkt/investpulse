@@ -112,8 +112,19 @@ async function ghFetch<T>(token: string, path: string, options: RequestInit = {}
   return res.json() as Promise<T>;
 }
 
-/** Запускает workflow синхронизации. Возвращает id запуска. */
+function findActiveRun(runs: { id: number; status: string }[]): { id: number; status: string } | undefined {
+  return runs.find((r) => r.status === 'in_progress' || r.status === 'queued' || r.status === 'waiting');
+}
+
+/** Запускает workflow синхронизации. Возвращает id запуска.
+ *  Если синхронизация уже идёт или ждёт очереди — дубль не создаём, следим за ней. */
 export async function dispatchCloudSync(token: string): Promise<number> {
+  const existing = await ghFetch<{ workflow_runs: { id: number; status: string }[] }>(
+    token,
+    `/repos/${GH_REPO}/actions/runs?per_page=5`,
+  );
+  const active = findActiveRun(existing.workflow_runs);
+  if (active) return active.id;
   await ghFetch(token, `/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
     method: 'POST',
     body: JSON.stringify({ ref: 'main' }),
@@ -124,12 +135,21 @@ export async function dispatchCloudSync(token: string): Promise<number> {
     token,
     `/repos/${GH_REPO}/actions/runs?per_page=5`,
   );
-  const running = runs.workflow_runs.find((r) => r.status === 'queued' || r.status === 'in_progress' || r.status === 'waiting');
+  const running = findActiveRun(runs.workflow_runs);
   if (!running) throw new Error('запуск workflow не обнаружен');
   return running.id;
 }
 
-export type CloudRunState = 'running' | 'success' | 'failure';
+/** Свежайший активный запуск workflow (идёт или ждёт очереди). */
+export async function newestActiveRun(token: string): Promise<number | null> {
+  const runs = await ghFetch<{ workflow_runs: { id: number; status: string }[] }>(
+    token,
+    `/repos/${GH_REPO}/actions/runs?per_page=5`,
+  );
+  return findActiveRun(runs.workflow_runs)?.id ?? null;
+}
+
+export type CloudRunState = 'running' | 'success' | 'failure' | 'cancelled';
 
 /** Состояние конкретного запуска workflow. */
 export async function cloudRunStatus(token: string, runId: number): Promise<CloudRunState> {
@@ -138,5 +158,6 @@ export async function cloudRunStatus(token: string, runId: number): Promise<Clou
     `/repos/${GH_REPO}/actions/runs/${runId}`,
   );
   if (run.status !== 'completed') return 'running';
+  if (run.conclusion === 'cancelled') return 'cancelled';
   return run.conclusion === 'success' ? 'success' : 'failure';
 }
